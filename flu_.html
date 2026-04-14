@@ -1,891 +1,670 @@
-<!-- Sanofi flu article block: clean body content for CMS embedding -->
+<!-- Static responsive flu article preserving original page design language -->
 <style>
-  .sf-flu,
-  .sf-flu * {
+  .flu-page,
+  .flu-page * {
     box-sizing: border-box;
   }
 
-  .sf-flu {
-    --sf-color-primary: #00A3E0;
-    --sf-color-primary-dark: #0077A8;
-    --sf-color-text: #17324D;
-    --sf-color-muted: #5F7388;
-    --sf-color-border: #D6E3EE;
-    --sf-color-surface: #FFFFFF;
-    --sf-color-surface-alt: #F4F8FB;
-    --sf-color-surface-soft: #EAF7FC;
-    --sf-shadow-lg: 0 24px 60px rgba(23, 50, 77, 0.12);
-    --sf-shadow-md: 0 14px 34px rgba(23, 50, 77, 0.1);
-    --sf-radius-xl: 28px;
-    --sf-radius-lg: 20px;
-    --sf-radius-md: 14px;
+  .flu-page {
+    --flu-primary: #00a3e0;
+    --flu-primary-dark: #007ab8;
+    --flu-text: #2f3d4a;
+    --flu-muted: #5f6f7f;
+    --flu-bg: #ffffff;
+    --flu-soft: #dfeeff;
+    --flu-soft-alt: #edf5ff;
+    --flu-border: #d6e1ec;
+    --flu-shadow: 0 10px 30px rgba(31, 52, 73, 0.08);
     margin: 0;
-    padding: 24px 0 64px;
-    background:
-      radial-gradient(circle at top right, rgba(0, 163, 224, 0.12), transparent 28%),
-      linear-gradient(180deg, #F7FBFD 0%, #EEF5F8 100%);
-    color: var(--sf-color-text);
+    padding: 0 0 56px;
+    background: #ffffff;
+    color: var(--flu-text);
     font-family: Arial, Helvetica, sans-serif;
-    line-height: 1.6;
+    line-height: 1.5;
   }
 
-  .sf-flu img {
-    display: block;
+  .flu-page img {
     max-width: 100%;
+    display: block;
     height: auto;
   }
 
-  .sf-flu a {
-    color: var(--sf-color-primary-dark);
-    text-decoration-thickness: 1px;
-    text-underline-offset: 2px;
+  .flu-page a {
+    color: inherit;
   }
 
-  .sf-flu a:hover {
-    color: var(--sf-color-primary);
-  }
-
-  .sf-flu__container {
-    width: min(1180px, calc(100% - 32px));
+  .flu-page__container {
+    width: min(1224px, calc(100% - 32px));
     margin: 0 auto;
   }
 
-  .sf-flu__hero {
-    display: grid;
-    gap: 24px;
-    padding: 24px;
-    border: 1px solid rgba(0, 163, 224, 0.14);
-    border-radius: 32px;
-    background: linear-gradient(135deg, #FFFFFF 0%, #F4FBFE 100%);
-    box-shadow: var(--sf-shadow-lg);
-    overflow: hidden;
+  .flu-page__menu-wrap {
+    margin: 0 0 40px;
+    border-bottom: 1px solid #eef3f7;
+    background: #ffffff;
   }
 
-  .sf-flu__hero-copy,
-  .sf-flu__hero-media {
-    min-width: 0;
+  .flu-page__menu {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 0;
+    list-style: none;
+    scrollbar-width: thin;
   }
 
-  .sf-flu__eyebrow {
+  .flu-page__menu-item {
+    flex: 0 0 auto;
+  }
+
+  .flu-page__menu-link {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    min-height: 56px;
+    padding: 14px 18px;
+    color: #4c6176;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .flu-page__menu-link:hover,
+  .flu-page__menu-link:focus-visible {
+    color: var(--flu-primary-dark);
+    border-bottom-color: rgba(0, 163, 224, 0.45);
+    outline: none;
+  }
+
+  .flu-page__menu-link--active {
+    color: #2d3e50;
+    border-bottom-color: var(--flu-primary);
+  }
+
+  .flu-page__hero {
+    position: relative;
+    min-height: 415px;
+    border-radius: 0;
+    overflow: hidden;
+    background: #d7eefe;
+    box-shadow: var(--flu-shadow);
+  }
+
+  .flu-page__hero picture,
+  .flu-page__hero-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .flu-page__hero-image {
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .flu-page__hero-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-end;
+    min-height: 415px;
+    padding: 32px 24px;
+  }
+
+  .flu-page__hero-card {
+    width: min(100%, 520px);
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.94);
+    color: #243746;
+    box-shadow: 0 16px 40px rgba(31, 52, 73, 0.14);
+  }
+
+  .flu-page__hero-title {
     margin: 0 0 14px;
-    padding: 8px 14px;
-    border-radius: 999px;
-    background: rgba(0, 163, 224, 0.1);
-    color: var(--sf-color-primary-dark);
-    font-size: 12px;
+    font-size: clamp(32px, 5vw, 48px);
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    line-height: 1.08;
   }
 
-  .sf-flu__eyebrow::before {
-    content: "";
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--sf-color-primary);
+  .flu-page__hero-text {
+    margin: 0 0 16px;
+    font-size: 18px;
+    line-height: 1.5;
+    color: #31495b;
   }
 
-  .sf-flu__title {
+  .flu-page__hero-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--flu-primary-dark);
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .flu-page__hero-link::after {
+    content: "→";
+    font-size: 17px;
+    line-height: 1;
+  }
+
+  .flu-page__stack {
+    display: grid;
+    gap: 40px;
+    margin-top: 40px;
+  }
+
+  .flu-page__section {
+    display: grid;
+    gap: 0;
+  }
+
+  .flu-page__section-card {
+    display: grid;
+    background: var(--flu-soft);
+    border: 1px solid #dce9f5;
+  }
+
+  .flu-page__section-card--half {
+    background: var(--flu-soft-alt);
+  }
+
+  .flu-page__section-main {
+    padding: 28px 24px;
+  }
+
+  .flu-page__section-title {
+    margin: 0 0 18px;
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 700;
+    line-height: 1.1;
+    color: #2a3b4b;
+  }
+
+  .flu-page__section-copy,
+  .flu-page__rich-text {
+    color: #304659;
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  .flu-page__section-copy p,
+  .flu-page__rich-text p {
     margin: 0;
-    font-size: clamp(2rem, 5vw, 3.75rem);
-    line-height: 1.05;
-    letter-spacing: -0.03em;
   }
 
-  .sf-flu__lead {
-    margin: 18px 0 0;
-    max-width: 62ch;
-    color: var(--sf-color-muted);
-    font-size: clamp(1rem, 2vw, 1.15rem);
+  .flu-page__section-copy p + p,
+  .flu-page__rich-text p + p {
+    margin-top: 14px;
   }
 
-  .sf-flu__hero-actions {
+  .flu-page__section-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
     margin-top: 24px;
   }
 
-  .sf-flu__button {
+  .flu-page__button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 48px;
-    padding: 12px 20px;
-    border-radius: 999px;
+    min-height: 44px;
+    padding: 10px 22px;
     border: 1px solid transparent;
-    background: var(--sf-color-primary);
-    color: #FFFFFF !important;
-    font-weight: 700;
-    text-decoration: none !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-  }
-
-  .sf-flu__button:hover {
-    transform: translateY(-1px);
-    background: var(--sf-color-primary-dark);
-    box-shadow: 0 12px 24px rgba(0, 163, 224, 0.22);
-  }
-
-  .sf-flu__button--ghost {
-    border-color: rgba(0, 163, 224, 0.24);
-    background: rgba(255, 255, 255, 0.75);
-    color: var(--sf-color-primary-dark) !important;
-  }
-
-  .sf-flu__button--ghost:hover {
-    background: rgba(0, 163, 224, 0.08);
-  }
-
-  .sf-flu__hero-highlights {
-    display: grid;
-    gap: 12px;
-    margin-top: 28px;
-  }
-
-  .sf-flu__highlight {
-    padding: 16px 18px;
-    border: 1px solid rgba(0, 163, 224, 0.14);
-    border-radius: var(--sf-radius-md);
-    background: rgba(255, 255, 255, 0.86);
-  }
-
-  .sf-flu__highlight-value {
-    display: block;
-    margin-bottom: 6px;
-    color: var(--sf-color-primary-dark);
-    font-size: 1.4rem;
-    font-weight: 700;
-    line-height: 1.15;
-  }
-
-  .sf-flu__highlight-text {
-    display: block;
-    color: var(--sf-color-muted);
-    font-size: 0.95rem;
-  }
-
-  .sf-flu__media-frame {
-    height: 100%;
-    min-height: 280px;
-    border-radius: 24px;
-    overflow: hidden;
-    background: #D9EEF8;
-    box-shadow: var(--sf-shadow-md);
-  }
-
-  .sf-flu__media-frame img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .sf-flu__jump-nav {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin: 20px 0 24px;
-  }
-
-  .sf-flu__jump-link {
-    display: inline-flex;
-    align-items: center;
-    min-height: 40px;
-    padding: 8px 14px;
-    border: 1px solid var(--sf-color-border);
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.88);
-    color: var(--sf-color-text);
-    font-size: 0.95rem;
+    background: var(--flu-primary);
+    color: #ffffff;
+    font-size: 15px;
     font-weight: 600;
     text-decoration: none;
   }
 
-  .sf-flu__jump-link:hover {
-    border-color: rgba(0, 163, 224, 0.34);
-    background: rgba(0, 163, 224, 0.08);
+  .flu-page__button--ghost {
+    background: transparent;
+    color: var(--flu-primary-dark);
+    border-color: rgba(0, 163, 224, 0.45);
   }
 
-  .sf-flu__stats {
-    display: grid;
-    gap: 14px;
-    margin-bottom: 28px;
+  .flu-page__button:hover,
+  .flu-page__button:focus-visible {
+    opacity: 0.92;
+    outline: none;
   }
 
-  .sf-flu__stat {
-    padding: 22px;
-    border: 1px solid rgba(0, 163, 224, 0.12);
-    border-radius: var(--sf-radius-lg);
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: var(--sf-shadow-md);
+  .flu-page__section-side {
+    padding: 24px;
+    border-top: 1px solid rgba(120, 151, 179, 0.18);
+    background: rgba(255, 255, 255, 0.28);
   }
 
-  .sf-flu__stat-value {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--sf-color-primary-dark);
-    font-size: clamp(1.75rem, 4vw, 2.4rem);
-    font-weight: 700;
-    line-height: 1;
-  }
-
-  .sf-flu__stat p {
-    margin: 0;
-    color: var(--sf-color-muted);
-  }
-
-  .sf-flu__layout {
-    display: grid;
-    gap: 24px;
-  }
-
-  .sf-flu__aside-card,
-  .sf-flu__section,
-  .sf-flu__content-card,
-  .sf-flu__callout {
-    border: 1px solid rgba(0, 163, 224, 0.12);
-    border-radius: var(--sf-radius-xl);
-    background: var(--sf-color-surface);
-    box-shadow: var(--sf-shadow-md);
-  }
-
-  .sf-flu__aside-card {
-    padding: 20px;
-  }
-
-  .sf-flu__aside-title {
+  .flu-page__side-label {
     margin: 0 0 14px;
-    font-size: 0.95rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--sf-color-primary-dark);
+    color: #5e7487;
+    font-size: 14px;
+    font-weight: 600;
   }
 
-  .sf-flu__aside-list {
-    margin: 0;
-    padding-left: 18px;
+  .flu-page__toc {
+    display: grid;
+    gap: 10px;
   }
 
-  .sf-flu__aside-list li + li {
-    margin-top: 10px;
-  }
-
-  .sf-flu__aside-list a {
-    color: var(--sf-color-text);
+  .flu-page__toc-link {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    color: #304659;
+    font-size: 16px;
     text-decoration: none;
   }
 
-  .sf-flu__aside-list a:hover {
-    color: var(--sf-color-primary-dark);
+  .flu-page__toc-link::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    margin-top: 8px;
+    border-radius: 50%;
+    background: var(--flu-primary);
+    flex: 0 0 auto;
   }
 
-  .sf-flu__article {
+  .flu-page__text-block {
+    padding: 0 24px;
+    font-size: 17px;
+    line-height: 1.7;
+    color: #304659;
+  }
+
+  .flu-page__text-block a {
+    color: var(--flu-primary-dark);
+  }
+
+  .flu-page__divider {
+    height: 40px;
+  }
+
+  .flu-page__two-col {
     display: grid;
     gap: 24px;
   }
 
-  .sf-flu__section,
-  .sf-flu__content-card {
-    padding: 24px;
-    scroll-margin-top: 24px;
-  }
-
-  .sf-flu__section--soft {
-    background: linear-gradient(180deg, #FFFFFF 0%, #F6FBFD 100%);
-  }
-
-  .sf-flu__section--accent {
-    background: linear-gradient(180deg, #F0FAFE 0%, #FFFFFF 100%);
-  }
-
-  .sf-flu__section--tint,
-  .sf-flu__content-card--tint {
-    background: var(--sf-color-surface-alt);
-  }
-
-  .sf-flu__section-head {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 18px;
-  }
-
-  .sf-flu__section-kicker {
-    margin: 0;
-    color: var(--sf-color-primary-dark);
-    font-size: 0.88rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .sf-flu__section h2,
-  .sf-flu__content-card h2,
-  .sf-flu__content-card h3 {
-    margin: 0;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
-  }
-
-  .sf-flu__section h2 {
-    font-size: clamp(1.55rem, 3vw, 2.2rem);
-  }
-
-  .sf-flu__content-card h3 {
-    font-size: 1.25rem;
-  }
-
-  .sf-flu__section p,
-  .sf-flu__content-card p,
-  .sf-flu__section li,
-  .sf-flu__content-card li {
-    margin: 0;
-    color: var(--sf-color-text);
-  }
-
-  .sf-flu__rich-text {
-    display: grid;
-    gap: 14px;
-  }
-
-  .sf-flu__split,
-  .sf-flu__grid {
-    display: grid;
-    gap: 18px;
-    margin-top: 18px;
-  }
-
-  .sf-flu__info-card {
-    padding: 18px;
-    border: 1px solid rgba(0, 163, 224, 0.12);
-    border-radius: var(--sf-radius-lg);
-    background: rgba(255, 255, 255, 0.92);
-  }
-
-  .sf-flu__info-card h3 {
-    margin: 0 0 12px;
-    font-size: 1.05rem;
-  }
-
-  .sf-flu__list,
-  .sf-flu__source-list {
+  .flu-page__bullet-list {
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  .sf-flu__list li {
+  .flu-page__bullet-list li {
     position: relative;
-    padding-left: 20px;
+    padding-left: 18px;
   }
 
-  .sf-flu__list li + li {
+  .flu-page__bullet-list li + li {
+    margin-top: 14px;
+  }
+
+  .flu-page__bullet-list li::before {
+    content: "►";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--flu-primary-dark);
+    font-size: 14px;
+    line-height: 1.9;
+  }
+
+  .flu-page__sources {
+    padding: 28px 24px;
+    border: 1px solid var(--flu-border);
+    background: #ffffff;
+    box-shadow: var(--flu-shadow);
+  }
+
+  .flu-page__sources-title {
+    margin: 0 0 20px;
+    font-size: 26px;
+    font-weight: 700;
+    color: #2a3b4b;
+  }
+
+  .flu-page__sources-list {
+    margin: 0;
+    padding-left: 20px;
+    color: #33495b;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  .flu-page__sources-list li + li {
     margin-top: 12px;
   }
 
-  .sf-flu__list li::before {
-    content: "";
-    position: absolute;
-    top: 0.72em;
-    left: 0;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--sf-color-primary);
-    transform: translateY(-50%);
-  }
-
-  .sf-flu__checklist {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: grid;
-    gap: 14px;
-  }
-
-  .sf-flu__checklist li {
-    padding: 18px;
-    border-radius: var(--sf-radius-lg);
-    background: rgba(255, 255, 255, 0.8);
-    border: 1px solid rgba(0, 163, 224, 0.12);
-  }
-
-  .sf-flu__checklist li::before {
-    content: "►";
-    margin-right: 10px;
-    color: var(--sf-color-primary-dark);
-    font-weight: 700;
-  }
-
-  .sf-flu__callout {
-    padding: 20px;
-    margin-bottom: 18px;
-    background: linear-gradient(180deg, #EAF8FD 0%, #FFFFFF 100%);
-  }
-
-  .sf-flu__callout-title {
-    margin: 0 0 8px;
-    color: var(--sf-color-primary-dark);
-    font-size: 1.05rem;
-    font-weight: 700;
-  }
-
-  .sf-flu__callout p {
-    margin: 0;
-    color: var(--sf-color-muted);
-  }
-
-  .sf-flu__source-list {
-    counter-reset: source-counter;
-    display: grid;
-    gap: 12px;
-  }
-
-  .sf-flu__source-list li {
-    position: relative;
-    padding: 16px 18px 16px 54px;
-    border: 1px solid rgba(0, 163, 224, 0.12);
-    border-radius: var(--sf-radius-lg);
-    background: rgba(255, 255, 255, 0.8);
-  }
-
-  .sf-flu__source-list li::before {
-    counter-increment: source-counter;
-    content: counter(source-counter);
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background: rgba(0, 163, 224, 0.12);
-    color: var(--sf-color-primary-dark);
-    font-size: 0.82rem;
-    font-weight: 700;
-  }
-
-  .sf-flu__footnote {
-    margin-top: 18px;
-    color: var(--sf-color-muted);
-    font-size: 0.92rem;
-  }
-
   @media (min-width: 768px) {
-    .sf-flu {
-      padding-top: 32px;
+    .flu-page__container {
+      width: min(1224px, calc(100% - 56px));
     }
 
-    .sf-flu__container {
-      width: min(1180px, calc(100% - 56px));
+    .flu-page__hero-content,
+    .flu-page__section-main,
+    .flu-page__section-side,
+    .flu-page__text-block,
+    .flu-page__sources {
+      padding-left: 32px;
+      padding-right: 32px;
     }
 
-    .sf-flu__hero {
-      grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
-      align-items: stretch;
-      padding: 32px;
-    }
-
-    .sf-flu__hero-highlights,
-    .sf-flu__stats,
-    .sf-flu__grid--2,
-    .sf-flu__split {
+    .flu-page__two-col {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  @media (min-width: 1080px) {
-    .sf-flu__layout {
-      grid-template-columns: 280px minmax(0, 1fr);
-      align-items: start;
+  @media (min-width: 960px) {
+    .flu-page__section-card {
+      grid-template-columns: minmax(0, 1fr) 320px;
+      align-items: stretch;
     }
 
-    .sf-flu__aside {
-      position: sticky;
-      top: 24px;
+    .flu-page__section-side {
+      border-top: 0;
+      border-left: 1px solid rgba(120, 151, 179, 0.18);
     }
 
-    .sf-flu__stats {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+    .flu-page__hero-content {
+      padding: 48px 40px;
+    }
+
+    .flu-page__section-main {
+      padding: 36px 40px;
+    }
+
+    .flu-page__section-side {
+      padding: 36px 28px;
+    }
+
+    .flu-page__text-block {
+      padding-left: 40px;
+      padding-right: 40px;
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .sf-flu__button,
-    .sf-flu__jump-link {
-      transition: none;
+  @media (max-width: 767px) {
+    .flu-page {
+      padding-bottom: 40px;
+    }
+
+    .flu-page__menu-link {
+      min-height: 50px;
+      padding: 12px 14px;
+      font-size: 14px;
+    }
+
+    .flu-page__hero,
+    .flu-page__hero-content {
+      min-height: 360px;
+    }
+
+    .flu-page__hero-card {
+      width: 100%;
+      padding: 20px;
+    }
+
+    .flu-page__hero-text,
+    .flu-page__section-copy,
+    .flu-page__rich-text,
+    .flu-page__text-block {
+      font-size: 16px;
     }
   }
 
   @media print {
-    .sf-flu {
-      padding: 0;
-      background: #FFFFFF;
+    .flu-page__menu-wrap {
+      display: none;
     }
 
-    .sf-flu__container {
-      width: 100%;
-    }
-
-    .sf-flu__hero,
-    .sf-flu__aside-card,
-    .sf-flu__section,
-    .sf-flu__content-card,
-    .sf-flu__callout,
-    .sf-flu__stat {
+    .flu-page__hero,
+    .flu-page__section-card,
+    .flu-page__sources {
       box-shadow: none;
-      border-color: #D9D9D9;
-    }
-
-    .sf-flu__jump-nav,
-    .sf-flu__hero-actions,
-    .sf-flu__aside {
-      display: none !important;
     }
   }
 </style>
 
-<main class="sf-flu" id="sf-flu-top">
-  <div class="sf-flu__container">
-    <!-- Hero block with primary visual and quick facts -->
-    <header class="sf-flu__hero">
-      <div class="sf-flu__hero-copy">
-        <p class="sf-flu__eyebrow">Вакцинопрофилактика</p>
-        <h1 class="sf-flu__title">Грипп</h1>
-        <p class="sf-flu__lead">
-          Одна из важнейших инфекционных угроз для населения земного шара [1]. Ежегодно в РФ
-          регистрируется более 30 млн. случаев ОРЗ и гриппа [2].
-        </p>
+<main class="flu-page">
+  <div class="flu-page__menu-wrap">
+    <div class="flu-page__container">
+      <nav aria-label="Разделы страницы">
+        <ul class="flu-page__menu">
+          <li class="flu-page__menu-item"><a class="flu-page__menu-link" href="#flu-home">Главная</a></li>
+          <li class="flu-page__menu-item"><a class="flu-page__menu-link" href="#flu-epidemiology">Инфекции</a></li>
+          <li class="flu-page__menu-item"><a class="flu-page__menu-link flu-page__menu-link--active" href="#flu-hero">Грипп</a></li>
+          <li class="flu-page__menu-item"><a class="flu-page__menu-link" href="#flu-timing">Календарь</a></li>
+          <li class="flu-page__menu-item"><a class="flu-page__menu-link" href="#flu-compatibility">Вакцины</a></li>
+          <li class="flu-page__menu-item"><a class="flu-page__menu-link" href="#flu-sources">Документы</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
 
-        <div class="sf-flu__hero-actions">
-          <a class="sf-flu__button" href="#sf-flu-sections">Перейти к разделам</a>
-          <a class="sf-flu__button sf-flu__button--ghost" href="#sf-flu-sources">Источники</a>
-        </div>
+  <div class="flu-page__container" id="flu-home">
+    <section class="flu-page__hero" id="flu-hero" aria-labelledby="flu-title">
+      <picture>
+        <source media="(max-width: 575px)" srcset="/upload/landing/45e/xnngffayvdlxqkzqd96y54151nro9wq8.png">
+        <source media="(max-width: 1023px)" srcset="/upload/landing/bda/tdpw7udq92qb3xn69ntkxw0335odpngz.png">
+        <img class="flu-page__hero-image" src="/upload/landing/0b7/n16aw60hte177ao1d7tsv32gn9dmdc8k.png" alt="Грипп">
+      </picture>
 
-        <div class="sf-flu__hero-highlights" aria-label="Ключевые акценты">
-          <div class="sf-flu__highlight">
-            <span class="sf-flu__highlight-value">30+ млн</span>
-            <span class="sf-flu__highlight-text">случаев ОРЗ и гриппа регистрируется ежегодно в РФ [2]</span>
-          </div>
-          <div class="sf-flu__highlight">
-            <span class="sf-flu__highlight-value">54,6%</span>
-            <span class="sf-flu__highlight-text">госпитализированных пациентов имеют осложнения [3]</span>
-          </div>
-          <div class="sf-flu__highlight">
-            <span class="sf-flu__highlight-value">3–7 дней</span>
-            <span class="sf-flu__highlight-text">может составлять отсутствие на работе из-за гриппа [6]</span>
-          </div>
-          <div class="sf-flu__highlight">
-            <span class="sf-flu__highlight-value">2–3 недели</span>
-            <span class="sf-flu__highlight-text">минимальный интервал для вакцинации до сезонного подъема [7]</span>
-          </div>
+      <div class="flu-page__hero-content">
+        <div class="flu-page__hero-card">
+          <h1 class="flu-page__hero-title" id="flu-title">Грипп</h1>
+          <p class="flu-page__hero-text">
+            Одна из важнейших инфекционных угроз для населения земного шара [1]. Ежегодно в РФ
+            регистрируется более 30 млн. случаев ОРЗ и гриппа [2].
+          </p>
+          <a class="flu-page__hero-link" href="#flu-who">Подробнее</a>
         </div>
       </div>
-
-      <div class="sf-flu__hero-media">
-        <div class="sf-flu__media-frame">
-          <picture>
-            <source media="(max-width: 575px)" srcset="/upload/landing/45e/xnngffayvdlxqkzqd96y54151nro9wq8.png">
-            <source media="(max-width: 1023px)" srcset="/upload/landing/bda/tdpw7udq92qb3xn69ntkxw0335odpngz.png">
-            <img src="/upload/landing/0b7/n16aw60hte177ao1d7tsv32gn9dmdc8k.png" alt="Вакцинация против гриппа">
-          </picture>
-        </div>
-      </div>
-    </header>
-
-    <!-- Compact in-page navigation for fast scanning -->
-    <nav class="sf-flu__jump-nav" id="sf-flu-sections" aria-label="Навигация по разделам">
-      <a class="sf-flu__jump-link" href="#sf-flu-who">ВОЗ</a>
-      <a class="sf-flu__jump-link" href="#sf-flu-epidemiology">Эпидемиология</a>
-      <a class="sf-flu__jump-link" href="#sf-flu-economy">Экономика</a>
-      <a class="sf-flu__jump-link" href="#sf-flu-ministry">Рекомендации Минздрава РФ</a>
-      <a class="sf-flu__jump-link" href="#sf-flu-effectiveness">Эффективность вакцинации</a>
-      <a class="sf-flu__jump-link" href="#sf-flu-seasonality">Сезонные подъемы</a>
-      <a class="sf-flu__jump-link" href="#sf-flu-timing">Сроки вакцинации</a>
-      <a class="sf-flu__jump-link" href="#sf-flu-compatibility">Совместимость</a>
-      <a class="sf-flu__jump-link" href="#sf-flu-sources">Источники</a>
-    </nav>
-
-    <section class="sf-flu__stats" aria-label="Краткая сводка">
-      <article class="sf-flu__stat">
-        <span class="sf-flu__stat-value">2,4%</span>
-        <p>частота госпитализации пациентов с гриппом в возрасте 15–64 года [3]</p>
-      </article>
-      <article class="sf-flu__stat">
-        <span class="sf-flu__stat-value">88,9%</span>
-        <p>осложнений у госпитализированных пациентов приходится на пневмонию [3]</p>
-      </article>
-      <article class="sf-flu__stat">
-        <span class="sf-flu__stat-value">45%</span>
-        <p>минимальный рекомендуемый охват населения в рамках осенней прививочной кампании [8]</p>
-      </article>
     </section>
 
-    <div class="sf-flu__layout">
-      <aside class="sf-flu__aside" aria-label="Быстрая навигация">
-        <div class="sf-flu__aside-card">
-          <p class="sf-flu__aside-title">Содержание</p>
-          <ol class="sf-flu__aside-list">
-            <li><a href="#sf-flu-who">Рекомендации ВОЗ по составу вакцин</a></li>
-            <li><a href="#sf-flu-epidemiology">Эпидемиология и последствия гриппа</a></li>
-            <li><a href="#sf-flu-economy">Влияние на трудоспособность и экономику</a></li>
-            <li><a href="#sf-flu-ministry">Рекомендации Министерства здравоохранения РФ</a></li>
-            <li><a href="#sf-flu-effectiveness">Эффективность вакцинации против гриппа</a></li>
-            <li><a href="#sf-flu-seasonality">Данные о сезонных подъемах гриппа в России</a></li>
-            <li><a href="#sf-flu-timing">Сроки проведения вакцинации</a></li>
-            <li><a href="#sf-flu-compatibility">Совместимость с другими вакцинами</a></li>
-            <li><a href="#sf-flu-sources">Источники</a></li>
-          </ol>
+    <div class="flu-page__stack">
+      <section class="flu-page__section" id="flu-who">
+        <div class="flu-page__section-card">
+          <div class="flu-page__section-main">
+            <h2 class="flu-page__section-title">Рекомендации ВОЗ по составу вакцин против гриппа</h2>
+            <div class="flu-page__section-actions" aria-label="Действия">
+              <a class="flu-page__button" href="#flu-sources">Скачать</a>
+              <a class="flu-page__button flu-page__button--ghost" href="javascript:window.print()">Распечатать</a>
+            </div>
+          </div>
+
+          <aside class="flu-page__section-side">
+            <p class="flu-page__side-label">Заголовок навигации по странице или меню:</p>
+            <div class="flu-page__toc">
+              <a class="flu-page__toc-link" href="#flu-epidemiology">Эпидемиология и последствия гриппа</a>
+              <a class="flu-page__toc-link" href="#flu-economy">Влияние гриппа на трудоспособность и экономику</a>
+              <a class="flu-page__toc-link" href="#flu-ministry">Рекомендации Министерства здравоохранения РФ</a>
+              <a class="flu-page__toc-link" href="#flu-effectiveness">Эффективность вакцинации против гриппа</a>
+              <a class="flu-page__toc-link" href="#flu-seasonality">Данные о сезонных подъемах гриппа в России</a>
+              <a class="flu-page__toc-link" href="#flu-timing">Сроки проведения вакцинации</a>
+              <a class="flu-page__toc-link" href="#flu-compatibility">Совместимость с другими вакцинами</a>
+              <a class="flu-page__toc-link" href="#flu-sources">Источники</a>
+            </div>
+          </aside>
         </div>
-      </aside>
+      </section>
 
-      <article class="sf-flu__article">
-        <section class="sf-flu__section sf-flu__section--accent" id="sf-flu-who">
-          <div class="sf-flu__section-head">
-            <p class="sf-flu__section-kicker">Международные рекомендации</p>
-            <h2>Рекомендации ВОЗ по составу вакцин против гриппа</h2>
-          </div>
+      <div class="flu-page__text-block flu-page__rich-text">
+        <p>
+          28.02.2020 г. состоялось заседание Консультационного комитета ВОЗ с рекомендациями о составе вакцин
+          против гриппа на сезон 2020-2021 для Северного полушария.
+          <a href="https://www.who.int/influenza/vaccines/virus/recommendations/2020-21_north/en/" target="_blank" rel="noopener noreferrer">
+            https://www.who.int/influenza/vaccines/virus/recommendations/2020-21_north/en/
+          </a>
+        </p>
+        <p>Произошли изменения в составе, для трехвалентной вакцины изменились все три штамма (два А и один В).</p>
+        <p>Для трехвалентных вакцин, производимых на яйцах:</p>
+        <p>• A/Guangdong-Maonan/SWL1536/2019 (H1N1)pdm09-подобный вирус;</p>
+        <p>• A/Hong Kong/2671/2019 (H3N2) - подобный вирус;</p>
+        <p>• B/Washington/02/2019 (B/Victoria lineage) - подобный вирус;</p>
+        <p>и для четырехвалентных дополнительно:</p>
+        <p>• B/Phuket/3073/2013 (B/Yamagata lineage) - подобный вирус.</p>
+      </div>
 
-          <div class="sf-flu__rich-text">
-            <p>
-              28.02.2020 г. состоялось заседание Консультационного комитета ВОЗ с рекомендациями о составе
-              вакцин против гриппа на сезон 2020–2021 для Северного полушария.
-              <a href="https://www.who.int/influenza/vaccines/virus/recommendations/2020-21_north/en/" target="_blank" rel="noopener noreferrer">
-                Официальная публикация ВОЗ
-              </a>.
-            </p>
-            <p>
-              Произошли изменения в составе: для трехвалентной вакцины изменились все три штамма
-              (два A и один B).
-            </p>
-          </div>
-
-          <div class="sf-flu__split">
-            <section class="sf-flu__info-card">
-              <h3>Для трехвалентных вакцин, производимых на яйцах</h3>
-              <ul class="sf-flu__list">
-                <li>A/Guangdong-Maonan/SWL1536/2019 (H1N1)pdm09-подобный вирус.</li>
-                <li>A/Hong Kong/2671/2019 (H3N2)-подобный вирус.</li>
-                <li>B/Washington/02/2019 (B/Victoria lineage)-подобный вирус.</li>
-              </ul>
-            </section>
-
-            <section class="sf-flu__info-card">
-              <h3>Для четырехвалентных вакцин дополнительно</h3>
-              <ul class="sf-flu__list">
-                <li>B/Phuket/3073/2013 (B/Yamagata lineage)-подобный вирус.</li>
-              </ul>
-            </section>
+      <div class="flu-page__two-col">
+        <section class="flu-page__section" id="flu-epidemiology">
+          <div class="flu-page__section-card flu-page__section-card--half">
+            <div class="flu-page__section-main">
+              <h2 class="flu-page__section-title">Эпидемиология и последствия гриппа</h2>
+              <div class="flu-page__section-copy">
+                <p>Грипп - одна из важнейших инфекционных угроз для населения земного шара [1]. Ежегодно в РФ регистрируется более 30 млн. случаев ОРЗ и гриппа [2].</p>
+                <p>Частота госпитализации пациентов с гриппом в возрасте 15–64 года расценивается в 2,4%, в возрасте 65 лет и старше — 1,4%. В соответствии с российскими данными предполагается, что у 54,6% госпитализированных пациентов развиваются осложнения, наиболее частым (88,9%) является пневмония [3].</p>
+                <p>Респираторные инфекции также связаны с повышенным риском развития инфаркта миокарда. Грипп вызывает острый тромбоз в уже пораженных коронарных артериях с субкритическим уровнем стеноза [4].</p>
+                <p>Заболеть тяжелым гриппом может и здоровый человек [5].</p>
+              </div>
+              <div class="flu-page__section-actions">
+                <a class="flu-page__button" href="#flu-sources">Скачать</a>
+                <a class="flu-page__button flu-page__button--ghost" href="javascript:window.print()">Распечатать</a>
+              </div>
+            </div>
           </div>
         </section>
 
-        <div class="sf-flu__grid sf-flu__grid--2">
-          <section class="sf-flu__content-card sf-flu__content-card--tint" id="sf-flu-epidemiology">
-            <div class="sf-flu__section-head">
-              <p class="sf-flu__section-kicker">Риски и последствия</p>
-              <h3>Эпидемиология и последствия гриппа</h3>
+        <section class="flu-page__section" id="flu-economy">
+          <div class="flu-page__section-card flu-page__section-card--half">
+            <div class="flu-page__section-main">
+              <h2 class="flu-page__section-title">Влияние гриппа на трудоспособность и экономику</h2>
+              <div class="flu-page__section-copy">
+                <p>Грипп может влиять на трудоспособность работников, приводя к 3–7 дням отсутствия на работе; снижает производительность труда [6] у сотрудников, продолжающих работать в период болезни или выходящих на работу, не полностью выздоровев.</p>
+                <p>Для самого работника это экономический ущерб как прямой (потерянные рабочие дни), так и косвенный (затраты на лечение).</p>
+                <p>Отечественные и зарубежные исследования вакцинальных программ против гриппа у работающего населения показывают снижение заболеваемости гриппоподобными инфекциями, потерь рабочего времени и количества визитов к врачу при проведении вакцинации [7].</p>
+              </div>
+              <div class="flu-page__section-actions">
+                <a class="flu-page__button" href="#flu-sources">Скачать</a>
+                <a class="flu-page__button flu-page__button--ghost" href="javascript:window.print()">Распечатать</a>
+              </div>
             </div>
+          </div>
+        </section>
+      </div>
 
-            <div class="sf-flu__rich-text">
-              <p>
-                Грипп - одна из важнейших инфекционных угроз для населения земного шара [1]. Ежегодно в РФ
-                регистрируется более 30 млн. случаев ОРЗ и гриппа [2].
-              </p>
-              <p>
-                Частота госпитализации пациентов с гриппом в возрасте 15–64 года расценивается в 2,4%,
-                в возрасте 65 лет и старше — 1,4%. В соответствии с российскими данными предполагается,
-                что у 54,6% госпитализированных пациентов развиваются осложнения, наиболее частым (88,9%)
-                является пневмония [3].
-              </p>
-              <p>
-                Респираторные инфекции также связаны с повышенным риском развития инфаркта миокарда. Грипп
-                вызывает острый тромбоз в уже пораженных коронарных артериях с субкритическим уровнем
-                стеноза [4].
-              </p>
-              <p>Заболеть тяжелым гриппом может и здоровый человек [5].</p>
+      <section class="flu-page__section" id="flu-ministry">
+        <div class="flu-page__section-card">
+          <div class="flu-page__section-main">
+            <h2 class="flu-page__section-title">Рекомендации Министерства здравоохранения РФ</h2>
+            <div class="flu-page__section-actions">
+              <a class="flu-page__button" href="#flu-sources">Скачать</a>
+              <a class="flu-page__button flu-page__button--ghost" href="javascript:window.print()">Распечатать</a>
             </div>
-          </section>
+          </div>
 
-          <section class="sf-flu__content-card sf-flu__content-card--tint" id="sf-flu-economy">
-            <div class="sf-flu__section-head">
-              <p class="sf-flu__section-kicker">Трудоспособность</p>
-              <h3>Влияние гриппа на трудоспособность и экономику</h3>
+          <aside class="flu-page__section-side">
+            <p class="flu-page__side-label">Заголовок навигации по странице или меню:</p>
+            <div class="flu-page__toc">
+              <a class="flu-page__toc-link" href="#flu-effectiveness">Эффективность вакцинации против гриппа</a>
+              <a class="flu-page__toc-link" href="#flu-seasonality">Сезонные подъемы гриппа в России</a>
+              <a class="flu-page__toc-link" href="#flu-timing">Сроки проведения вакцинации</a>
             </div>
-
-            <div class="sf-flu__rich-text">
-              <p>
-                Грипп может влиять на трудоспособность работников, приводя к 3–7 дням отсутствия на работе;
-                снижает производительность труда [6] у сотрудников, продолжающих работать в период болезни
-                или выходящих на работу, не полностью выздоровев.
-              </p>
-              <p>
-                Для самого работника это экономический ущерб как прямой (потерянные рабочие дни),
-                так и косвенный (затраты на лечение).
-              </p>
-              <p>
-                Отечественные и зарубежные исследования вакцинальных программ против гриппа у работающего
-                населения показывают снижение заболеваемости гриппоподобными инфекциями, потерь рабочего
-                времени и количества визитов к врачу при проведении вакцинации [7].
-              </p>
-            </div>
-          </section>
+          </aside>
         </div>
+      </section>
 
-        <section class="sf-flu__section sf-flu__section--soft" id="sf-flu-ministry">
-          <div class="sf-flu__section-head">
-            <p class="sf-flu__section-kicker">Национальные рекомендации</p>
-            <h2>Рекомендации Министерства здравоохранения РФ</h2>
-          </div>
+      <div class="flu-page__text-block">
+        <ul class="flu-page__bullet-list">
+          <li>Министерство здравоохранения РФ рекомендует ежегодную вакцинацию против гриппа как наиболее важное защитное мероприятие в отношении гриппа и его осложнений [8].</li>
+          <li>Ежегодно выпускаемое Постановление Главного государственного санитарного врача РФ «О мероприятиях по профилактике гриппа и острых респираторных вирусных инфекций» регламентирует проведение прививочной кампании против гриппа в осенний период каждого года и предусматривать охват не менее 45% от численности населения, с охватом иммунизацией лиц из групп риска, определенных национальным календарем, не менее 75%, а также выделять ассигнований на вакцинацию групп, не входящих в национальный календарь [8].</li>
+        </ul>
+      </div>
 
-          <ul class="sf-flu__checklist">
-            <li>
-              Министерство здравоохранения РФ рекомендует ежегодную вакцинацию против гриппа как наиболее
-              важное защитное мероприятие в отношении гриппа и его осложнений [8].
-            </li>
-            <li>
-              Ежегодно выпускаемое Постановление Главного государственного санитарного врача РФ
-              «О мероприятиях по профилактике гриппа и острых респираторных вирусных инфекций»
-              регламентирует проведение прививочной кампании против гриппа в осенний период каждого года
-              и предусматривает охват не менее 45% от численности населения, с охватом иммунизацией лиц
-              из групп риска, определенных национальным календарем, не менее 75%, а также выделение
-              ассигнований на вакцинацию групп, не входящих в национальный календарь [8].
-            </li>
-          </ul>
-        </section>
+      <div class="flu-page__text-block flu-page__rich-text" id="flu-effectiveness">
+        <h2 class="flu-page__section-title">Эффективность вакцинации против гриппа</h2>
+        <ul class="flu-page__bullet-list">
+          <li>Эффективность вакцинации против гриппа может варьировать от сезона к сезону, но она остается лучшим средством для защиты от гриппа и способствует ограничению распространения вируса среди населения [1].</li>
+          <li>Кроме того, вакцинация против гриппа предотвращает острые сердечно-сосудистые нарушения. Расчетная эффективность вакцины против острого инфаркта миокарда (ОИМ) сопоставима с эффективностью общепринятой терапии для вторичной профилактики ОИМ из данных клинических исследований (прием статинов, антигипертензивных препаратов, отказа от курения) [4].</li>
+        </ul>
+      </div>
 
-        <section class="sf-flu__section" id="sf-flu-effectiveness">
-          <div class="sf-flu__section-head">
-            <p class="sf-flu__section-kicker">Профилактическая эффективность</p>
-            <h2>Эффективность вакцинации против гриппа</h2>
-          </div>
-
-          <div class="sf-flu__split">
-            <section class="sf-flu__info-card">
-              <h3>Базовый защитный эффект</h3>
-              <ul class="sf-flu__list">
-                <li>
-                  Эффективность вакцинации против гриппа может варьировать от сезона к сезону, но она
-                  остается лучшим средством для защиты от гриппа и способствует ограничению распространения
-                  вируса среди населения [1].
-                </li>
-              </ul>
-            </section>
-
-            <section class="sf-flu__info-card">
-              <h3>Дополнительная клиническая польза</h3>
-              <ul class="sf-flu__list">
-                <li>
-                  Кроме того, вакцинация против гриппа предотвращает острые сердечно-сосудистые нарушения.
-                  Расчетная эффективность вакцины против острого инфаркта миокарда (ОИМ) сопоставима с
-                  эффективностью общепринятой терапии для вторичной профилактики ОИМ из данных клинических
-                  исследований (прием статинов, антигипертензивных препаратов, отказа от курения) [4].
-                </li>
-              </ul>
-            </section>
-          </div>
-        </section>
-
-        <section class="sf-flu__section sf-flu__section--soft" id="sf-flu-seasonality">
-          <div class="sf-flu__section-head">
-            <p class="sf-flu__section-kicker">Мониторинг сезона</p>
-            <h2>Данные о сезонных подъемах гриппа в России</h2>
-          </div>
-
-          <div class="sf-flu__callout">
-            <p class="sf-flu__callout-title">Опрос специалистов здравоохранения</p>
-            <p>Пройдите опрос и получите результаты по итогам ответов специалистов здравоохранения.</p>
-          </div>
-
-          <div class="sf-flu__rich-text">
-            <p>
-              По данным национальных российских центров по гриппу [9,10], в 2016–2017 гг. сезонный подъем
-              гриппа начался на второй неделе декабря, в сезоне 2017–2018 гг. начало повышения
-              заболеваемости гриппом отмечено в январе-феврале.
-            </p>
-            <p>
-              В предэпидемический период рост заболеваемости обусловлен рино-, адено- и другими
-              респираторными вирусами (парагрипп, РС и проч.) [10].
-            </p>
-          </div>
-        </section>
-
-        <div class="sf-flu__grid sf-flu__grid--2">
-          <section class="sf-flu__content-card" id="sf-flu-timing">
-            <div class="sf-flu__section-head">
-              <p class="sf-flu__section-kicker">Организация вакцинации</p>
-              <h3>Сроки проведения вакцинации</h3>
+      <section class="flu-page__section" id="flu-seasonality">
+        <div class="flu-page__section-card">
+          <div class="flu-page__section-main">
+            <h2 class="flu-page__section-title">Данные о сезонных подъемах гриппа в России</h2>
+            <div class="flu-page__section-copy">
+              <p>Пройдите опрос и получите результаты по итогам ответов специалистов здравоохранения.</p>
             </div>
-
-            <div class="sf-flu__rich-text">
-              <p>
-                Вакцинация проводится не менее чем за 2–3 недели до начала сезонного подъема. Вакцинация
-                может проводиться и в течение сезона гриппа, если человек не успел привиться ранее.
-              </p>
-              <p>
-                Грипп с апреля по сентябрь продолжает регистрироваться во многих странах мира, вакцина
-                должна вводиться путешественникам, которые пропустили вакцинацию осенью и зимой [7].
-              </p>
-              <p>
-                Имеются данные, что ранняя вакцинация (напр., в июле и августе) может быть связана с
-                недостаточным иммунитетом до окончания сезона гриппа, в частности среди взрослых старшего
-                возраста [11].
-              </p>
+            <div class="flu-page__section-actions">
+              <a class="flu-page__button" href="#flu-sources">Скачать</a>
+              <a class="flu-page__button flu-page__button--ghost" href="javascript:window.print()">Распечатать</a>
             </div>
-          </section>
+          </div>
 
-          <section class="sf-flu__content-card" id="sf-flu-compatibility">
-            <div class="sf-flu__section-head">
-              <p class="sf-flu__section-kicker">Комбинированная профилактика</p>
-              <h3>Совместимость с другими вакцинами</h3>
+          <aside class="flu-page__section-side">
+            <p class="flu-page__side-label">Заголовок навигации по странице или меню:</p>
+            <div class="flu-page__toc">
+              <a class="flu-page__toc-link" href="#flu-timing">Сроки проведения вакцинации</a>
+              <a class="flu-page__toc-link" href="#flu-compatibility">Совместимость с другими вакцинами</a>
+              <a class="flu-page__toc-link" href="#flu-sources">Источники</a>
             </div>
-
-            <div class="sf-flu__rich-text">
-              <p>
-                Иммунизацию против гриппа инактивированными вакцинами можно проводить одновременно с
-                вакцинацией против других заболеваний, например, пневмококковых инфекций [8] и дифтерии,
-                столбняка, коклюша [8,12].
-              </p>
-            </div>
-          </section>
+          </aside>
         </div>
+      </section>
 
-        <section class="sf-flu__section sf-flu__section--accent" id="sf-flu-sources">
-          <div class="sf-flu__section-head">
-            <p class="sf-flu__section-kicker">Библиография</p>
-            <h2>Источники</h2>
+      <div class="flu-page__text-block flu-page__rich-text">
+        <p>По данным национальных российских центров по гриппу [9,10], в 2016–2017 гг. сезонный подъем гриппа начался на второй неделе декабря, в сезоне 2017-2018 гг. начало повышения заболеваемости гриппом отмечено в январе-феврале. В предэпидемический период рост заболеваемости обусловлен рино-, адено- и другими респираторными вирусами (парагрипп, РС и проч.) [10].</p>
+      </div>
+
+      <div class="flu-page__two-col">
+        <section class="flu-page__section" id="flu-timing">
+          <div class="flu-page__section-card flu-page__section-card--half">
+            <div class="flu-page__section-main">
+              <h2 class="flu-page__section-title">Сроки проведения вакцинации</h2>
+              <div class="flu-page__section-copy">
+                <p>Вакцинация проводится не менее чем за 2–3 недели до начала сезонного подъема. Вакцинация может проводиться и в течение сезона гриппа, если человек не успел привиться ранее. Грипп с апреля по сентябрь продолжает регистрироваться во многих странах мира, вакцина должна вводиться путешественникам, которые пропустили вакцинацию осенью и зимой [7].</p>
+                <p>Имеются данные, что ранняя вакцинация (напр., в июле и августе) может быть связана с недостаточным иммунитетом до окончания сезона гриппа, в частности среди взрослых старшего возраста [11].</p>
+              </div>
+              <div class="flu-page__section-actions">
+                <a class="flu-page__button" href="#flu-sources">Скачать</a>
+                <a class="flu-page__button flu-page__button--ghost" href="javascript:window.print()">Распечатать</a>
+              </div>
+            </div>
           </div>
-
-          <ol class="sf-flu__source-list">
-            <li>Гриппозные вакцины: документ по позиции ВОЗ. Еженедельный эпидемиологический бюллетень, 23 ноября 2012 г. 2012; 87: 461–476.</li>
-            <li>О состоянии санитарно-эпидемиологического благополучия населения в Российской Федерации в 2018 году: Государственный доклад. — М.: Федеральная служба по надзору в сфере защиты прав потребителей и благополучия человека, 2019.</li>
-            <li>Харит С.М., Рудакова А.В., Усков А.Н. и соавт. Журнал инфектологии. 2017; 2: 17–22.</li>
-            <li>Barnes M., Heywood A., Mahimbo A. et al. Heart. 2015; 101: 1738–1747.</li>
-            <li>Национальные центры по гриппу ВОЗ в России. Эпидемия гриппа в России, сезон 2014–2015. Годовой отчет.</li>
-            <li>Keech M., Scott A.J., Ryan P.J. Occup. Med. (Lond). 1998; 48 (2): 85–90.</li>
-            <li>Профессиональные заболевания органов дыхания: национальное руководство / Под. ред. Н.Ф. Измерова, А.Г. Чучалина. — М.: ГЭОТАР-Медиа, 2015. — 792 с.</li>
-            <li>Приказ Минздрава России от 21 марта 2014 г. №125н «Об утверждении национального календаря профилактических прививок и календаря профилактических прививок по эпидемическим показаниям» (в ред. от 24.04.2019).</li>
-            <li>Салтыкова Т.С., Жигарловский Б.А., Иваненко А.В. и соавт. Журнал инфектологии. 2019; 2: 124–132.</li>
-            <li>Соминина А.А., Даниленко Д.М., Комиссаров А.Б. и соавт. Инфекция и иммунитет. 2018; 4(8): 473–488.</li>
-            <li>Prevention and Control of Seasonal Influenza with Vaccines: Recommendations of the Advisory Committee on Immunization Practices — United States, 2017–18. Influenza Season. MMWR. 2017; 66 (2): 1–20.</li>
-            <li>
-              Инструкция по медицинскому применению лекарственного препарата Адасель (вакцина для профилактики дифтерии (с уменьшенным содержанием антигена), столбняка и коклюша (бесклеточная), комбинированная, адсорбированная,
-              <a href="http://grls.rosminzdrav.ru" target="_blank" rel="noopener noreferrer">http://grls.rosminzdrav.ru</a>).
-            </li>
-          </ol>
-
-          <p class="sf-flu__footnote">
-            Материал адаптирован в чистый HTML-блок для встраивания в CMS без внешних библиотек и
-            конструкторных компонентов.
-          </p>
         </section>
-      </article>
+
+        <section class="flu-page__section" id="flu-compatibility">
+          <div class="flu-page__section-card flu-page__section-card--half">
+            <div class="flu-page__section-main">
+              <h2 class="flu-page__section-title">Совместимость с другими вакцинами</h2>
+              <div class="flu-page__section-copy">
+                <p>Иммунизацию против гриппа инактивированными вакцинами можно проводить одновременно с вакцинацией против других заболеваний, например, пневмококковых инфекций [8] и дифтерии, столбняка, коклюша [8,12].</p>
+              </div>
+              <div class="flu-page__section-actions">
+                <a class="flu-page__button" href="#flu-sources">Скачать</a>
+                <a class="flu-page__button flu-page__button--ghost" href="javascript:window.print()">Распечатать</a>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <section class="flu-page__sources" id="flu-sources">
+        <h2 class="flu-page__sources-title">Источники</h2>
+        <ol class="flu-page__sources-list">
+          <li>Гриппозные вакцины: документ по позиции ВОЗ. Еженедельный эпидемиологический бюллетень, 23 ноября 2012 г. 2012; 87: 461–476;</li>
+          <li>О состоянии санитарно-эпидемиологического благополучия населения в Российской Федерации в 2018 году: Государственный доклад. — М.: Федеральная служба по надзору в сфере защиты прав потребителей и благополучия человека, 2019;</li>
+          <li>Харит С.М., Рудакова А.В., Усков А.Н. и соавт. Журнал инфектологии. 2017; 2: 17–22;</li>
+          <li>Barnes M., Heywood A., Mahimbo A. et al. Heart. 2015;101: 1738–1747;</li>
+          <li>Национальные центры по гриппу ВОЗ в России. Эпидемия гриппа в России, сезон 2014–2015. Годовой отчет;</li>
+          <li>Keech M., Scott A.J., Ryan P.J. Occup. Med. (Lond). 1998;48 (2): 85–90;</li>
+          <li>Профессиональные заболевания органов дыхания: национальное руководство / Под. ред. Н.Ф. Измерова, А.Г. Чучалина. — М.: ГЭОТАР-Медиа, 2015. — 792 с;</li>
+          <li>Приказ Минздрава России от 21 марта 2014 г. №125н «Об утверждении национального календаря профилактических прививок и календаря профилактических прививок по эпидемическим показаниям» (в ред. от 24.04.2019);</li>
+          <li>Салтыкова Т.С., Жигарловский Б.А., Иваненко А.В. и соавт. Журнал инфектологии. 2019;2, 2019:124-132;</li>
+          <li>Соминина А.А, Даниленко Д.М., Комиссаров А.Б. и соавт. Инфекция и иммунитет. 2018;4(8):473-488;</li>
+          <li>Prevention and Control of Seasonal Influenza with Vaccines: Recommendations of the Advisory Committee on Immunization Practices — United States, 2017–18. Influenza Season. MMWR. — 2017;66 (2): 1–20;</li>
+          <li>Инструкция по медицинскому применению лекарственного препарата Адасель (вакцина для профилактики дифтерии (с уменьшенным содержанием антигена), столбняка и коклюша (бесклеточная), комбинированная, адсорбированная, <a href="http://grls.rosminzdrav.ru" target="_blank" rel="noopener noreferrer">http://grls.rosminzdrav.ru</a>).</li>
+        </ol>
+      </section>
     </div>
   </div>
 </main>
