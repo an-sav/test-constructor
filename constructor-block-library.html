@@ -11,9 +11,12 @@
       --text-muted: #3e4f65;
       --btn-primary: #0f5bb5;
       --btn-primary-hover: #0b4a92;
-      --btn-secondary-bg: #f6f8fb;
+      --btn-secondary-bg: #f8f8f9;
       --btn-secondary-border: #2f5497;
       --btn-secondary-hover-bg: #ebf1fa;
+      --medicine02: #fff;
+      --medicine03: #f8f8f9;
+      --font-family: "Circe", sans-serif;
     }
 
     * {
@@ -32,7 +35,7 @@
       margin: 0;
       background: var(--page-bg);
       color: var(--text-main);
-      font-family: "Circe", Arial, Helvetica, sans-serif;
+      font-family: var(--font-family);
     }
 
     .library-page {
@@ -60,13 +63,13 @@
       --ub-gap: 40px;
       --ub-min-height: 545px;
       --ub-content-max-width: 820px;
-      --ub-title-size: 44px;
-      --ub-body-size: 38px;
+      --ub-title-size: 36px;
+      --ub-body-size: 18px;
       --ub-nav-title-size: 24px;
-      --ub-item-size: 34px;
-      --ub-item-icon-size: 34px;
+      --ub-item-size: 18px;
+      --ub-item-icon-size: 24px;
       --ub-toggle-size: 40px;
-      --ub-text-color: #ffffff;
+      --ub-text-color: var(--medicine02);
       --ub-overlay:
         linear-gradient(135deg, rgba(108, 150, 235, 0.9) 0%, rgba(212, 82, 181, 0.8) 55%, rgba(132, 141, 236, 0.72) 100%);
       --ub-bg-image: none;
@@ -97,17 +100,19 @@
     .ub-fullwidth__title {
       margin: 0;
       font-size: clamp(30px, 3.5vw, var(--ub-title-size));
-      line-height: 1.14;
+      line-height: 1.11;
       font-weight: 700;
+      color: var(--medicine02);
       max-width: 24ch;
     }
 
     .ub-fullwidth__description {
       margin: 0;
       max-width: 34ch;
-      font-size: clamp(18px, 2.1vw, var(--ub-body-size));
-      line-height: 1.28;
+      font-size: var(--ub-body-size);
+      line-height: 1.33;
       font-weight: 400;
+      color: var(--medicine02);
     }
 
     .ub-fullwidth__actions {
@@ -122,8 +127,8 @@
       min-height: 52px;
       padding: 10px 20px;
       border-radius: 6px;
-      font-size: clamp(28px, 2.3vw, 36px);
-      line-height: 1.1;
+      font-size: 26px;
+      line-height: 1.38;
       font-family: inherit;
       font-weight: 400;
       text-align: center;
@@ -138,7 +143,7 @@
     .ub-btn--primary {
       background: var(--btn-primary);
       border-color: var(--btn-primary);
-      color: #fff;
+      color: var(--medicine02);
     }
 
     .ub-btn--primary:hover {
@@ -147,9 +152,9 @@
     }
 
     .ub-btn--secondary {
-      background: var(--btn-secondary-bg);
+      background: var(--medicine03);
       border-color: var(--btn-secondary-border);
-      color: var(--btn-secondary-border);
+      color: #263f7a;
     }
 
     .ub-btn--secondary:hover {
@@ -158,9 +163,10 @@
 
     .ub-fullwidth__nav-title {
       margin: 0 0 20px;
-      font-size: clamp(24px, 2.1vw, var(--ub-nav-title-size));
-      line-height: 1.2;
+      font-size: var(--ub-nav-title-size);
+      line-height: 1.13;
       font-weight: 700;
+      color: var(--medicine02);
       max-width: 26ch;
     }
 
@@ -204,7 +210,8 @@
 
     .ub-fullwidth__menu-text {
       min-width: 0;
-      font-size: clamp(24px, 1.9vw, var(--ub-item-size));
+      font-size: var(--ub-item-size);
+      line-height: 1.33;
       font-weight: 400;
       white-space: normal;
       word-break: break-word;
@@ -221,9 +228,10 @@
       background: transparent;
       color: inherit;
       font-family: inherit;
-      font-size: clamp(28px, 2.1vw, var(--ub-toggle-size));
-      line-height: 1.1;
+      font-size: var(--ub-toggle-size);
+      line-height: 1.4;
       font-weight: 700;
+      text-align: right;
       cursor: pointer;
     }
 
@@ -238,18 +246,18 @@
       transform: rotate(180deg);
     }
 
-    @media (max-width: 1279px) {
+    @media (max-width: 1023px) {
       .ub-fullwidth {
         --ub-radius: 12px;
         --ub-padding: 24px;
         --ub-gap: 32px;
         --ub-min-height: 482px;
-        --ub-title-size: 52px;
-        --ub-body-size: 42px;
-        --ub-nav-title-size: 34px;
-        --ub-item-size: 33px;
-        --ub-item-icon-size: 32px;
-        --ub-toggle-size: 36px;
+        --ub-title-size: 32px;
+        --ub-body-size: 16px;
+        --ub-nav-title-size: 22px;
+        --ub-item-size: 16px;
+        --ub-item-icon-size: 22px;
+        --ub-toggle-size: 18px;
       }
 
       .ub-fullwidth__menu {
@@ -268,11 +276,11 @@
         --ub-gap: 32px;
         --ub-min-height: 750px;
         --ub-title-size: 28px;
-        --ub-body-size: 24px;
+        --ub-body-size: 14px;
         --ub-nav-title-size: 18px;
-        --ub-item-size: 20px;
-        --ub-item-icon-size: 22px;
-        --ub-toggle-size: 20px;
+        --ub-item-size: 14px;
+        --ub-item-icon-size: 20px;
+        --ub-toggle-size: 16px;
         --ub-content-max-width: 100%;
         border-radius: 12px;
       }
@@ -284,7 +292,7 @@
       .ub-btn {
         min-width: 100%;
         min-height: 40px;
-        font-size: 34px;
+        font-size: 20px;
       }
 
       .ub-fullwidth__menu {
