@@ -1,0 +1,57 @@
+[APP_CATALOG]
+(Category 1: Access Only)
+  - ID: TIMECARD
+    Desc: Time tracking
+    Link_Form: "https://sanofiservices.service-now.com/onesupport?id=sc_cat_item&sys_id=327bce549724a910db1d3a871153afed"
+    Search_Query: (Subject: "Access request submitted" AND Body: "Timecard")
+    
+  - ID: CCT (Clinical Control Tower)
+    Desc: Study metrics
+    Link_Form: "https://sanofiservices.service-now.com/onesupport?id=sc_cat_item&sys_id=327bce549724a910db1d3a871153afed"
+    Search_Query: (Subject: "Access request submitted" AND Body: "CLINICAL CONTROL TOWER")
+    
+  - ID: PLAI
+    Desc: Advanced analytics
+    Link_Form: "https://sanofiservices.service-now.com/onesupport?id=sc_cat_item&sys_id=327bce549724a910db1d3a871153afed"
+    Search_Query: (Subject: "Access request submitted" AND Body: "Plai")
+    
+  - ID: ADOBE_ACROBAT_DC
+    Desc: PDF Editor (AppStore)
+    Link_Form: "https://appstore.sanofi.com/Shopping/"
+    Special_Validation: Check for sender "1ESanofiStoreProd" + Subject "Application Approved"
+
+(Category 2: Training + Access)
+  - ID: QUALIPSO
+    Training_Match: "GQT - QualiPSO - Curriculum"
+  - ID: ADOBE_SIGN_GXP
+    Training_Match: "GQT - ADOBE SIGN for GxP"
+  - ID: APPIAN_TEX
+    Training_Match: ALL("e-Signature", "TEX Overview", "TEX IPM")
+  - ID: APPIAN_MD (Material Destruction)
+    Training_Match: ALL("e-Signature", "Material Destruction")
+  - ID: VEEVA_CSC
+    Training_Match: "Curriculum for VEEVA CSC" OR ALL("Module 1", "Module 2", "Business Continuity")
+  - ID: DISCO
+    Training_Match: "CSCO-DISCO: Country Region Study Product Specialist"
+  - ID: SMARTSUPPLIES
+    Training_Match: "CSCO-WW: SmartSupplies End-Users"
+  - ID: COUPA_STD
+    Training_Match: "S2P Process overview"
+  - ID: COUPA_MULTI
+    Condition: Skip if user manages only 1 country
+
+(Category 3: Training Only)
+  - Apps: Outlining Life of a Drug, Trial Setup, eTMF, RAID, ClinOVault
+  - Note: eTMF/RAID/ClinOVault access is auto-granted upon study assignment.
+
+[EMAIL_PATTERNS]
+Pattern_Training:
+  Sender: SanofiLearning@sanofi.com
+  Concepts: "completed", "completion confirmation", "You have completed"
+Pattern_Access_Request:
+  Sender: User
+  Recipient: IPM_SME_TOOL@sanofi.com
+  Concepts: "Access request submitted", "ticket number"
+Pattern_Access_Granted:
+  Sender: sanofiservices@service-now.com
+  Concepts: "Access to [App] has been granted", "Request (ACR...) has been completed"
