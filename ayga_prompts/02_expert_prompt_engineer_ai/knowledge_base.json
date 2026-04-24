@@ -1,0 +1,1493 @@
+{
+    "name": "Core Principles of Prompt Engineering",
+    "version": "2.0",
+    "tag_glossary": {
+        "accuracy": "Techniques for reducing factual errors (hallucinations) and grounding the model's output in facts.",
+        "agent-design": "Principles for creating autonomous agents, including their roles, tools, and orchestration.",
+        "chain-of-thought": "Instructing the model to 'think step-by-step' to improve complex reasoning.",
+        "clarity": "Techniques for writing unambiguous and easily interpretable instructions for the model.",
+        "consistency": "Ensuring predictable and uniform output, style, and behavior across multiple interactions.",
+        "constraints": "Methods for defining rules, boundaries, and negative requirements (what the model should NOT do).",
+        "context-management": "Strategies for providing, managing, and maintaining relevant context within the prompt's token limit.",
+        "control-flow": "Techniques for directing the sequence of operations within a prompt, such as conditional logic.",
+        "efficiency": "Practices for optimizing prompts to reduce token count, cost, and latency.",
+        "error-handling": "Defining how the model should behave when it fails, encounters ambiguity, or cannot fulfill a request.",
+        "evaluation": "Methods and principles for testing, auditing, and measuring the quality of a prompt's output.",
+        "expert-persona": "Crafting a specific expert role for the model to adopt, including its knowledge, skills, and communication style.",
+        "few-shot-prompting": "Providing a small number of examples (shots) within the prompt to guide the model's behavior.",
+        "goal-setting": "Clearly defining the final objective or desired outcome of the prompt.",
+        "interaction-design": "Designing the user-facing aspects of the AI, including its conversational flow and personality.",
+        "knowledge-grounding": "Embedding a dedicated knowledge base or source of truth directly within the prompt.",
+        "localization": "Adapting prompts and their outputs for different languages, regions, and cultural contexts.",
+        "maintainability": "Writing prompts that are easy to read, debug, and update over time.",
+        "meta-prompting": "Techniques where the prompt instructs the model to reason about or modify its own behavior or the prompt itself.",
+        "modularity": "Designing prompts as reusable components or modules that can be combined for complex tasks.",
+        "negative-examples": "Providing explicit examples of what NOT to do to reinforce constraints.",
+        "orchestration": "Managing the interaction and workflow between multiple AI agents or specialized prompts.",
+        "persona-design": "General principles for creating and defining any type of character or role for the AI.",
+        "prompt-architecture": "The high-level structure and organization of a prompt, including the use of sections and delimiters.",
+        "quality-assurance": "The overall process of ensuring a prompt meets quality standards before deployment.",
+        "reasoning": "Techniques to elicit more advanced analytical, deductive, or creative thought processes.",
+        "refactoring": "The process of restructuring an existing prompt to improve its clarity, robustness, and maintainability.",
+        "retrieval-augmented-generation": "A pattern where external knowledge is retrieved and dynamically injected into the prompt (RAG).",
+        "robustness": "The ability of a prompt to handle unexpected inputs, edge cases, and adversarial attacks without failing.",
+        "safety": "Implementing safeguards to prevent harmful, unethical, or inappropriate outputs.",
+        "scalability": "Designing prompts and systems that can handle an increase in complexity or volume of use.",
+        "self-correction": "A pattern where the model is instructed to critique and refine its own output before finalizing it.",
+        "state-management": "Techniques for tracking context, progress, and memory across multiple turns in a conversation.",
+        "structured-output": "Strictly defining the format of the AI's output, such as JSON, XML, or Markdown, for reliable parsing.",
+        "task-decomposition": "Breaking down a complex task into a sequence of smaller, simpler steps for the model to follow.",
+        "workflow": "Defining an explicit, multi-step process or sequence of actions for the model to execute."
+    },
+    "lessons": [
+        {
+            "id": 1,
+            "title": "Handling Constraint Failures and System Overrides",
+            "problem": "A carefully crafted constraint within a prompt can fail for two primary reasons. First, it can be 'brittle' and ignored if a user's input strongly triggers a more fundamental, pre-trained behavior of the model. Second, it can be completely overridden by a higher-priority, built-in function of the underlying LLM platform (e.g., safety protocols, image generation tools), which the prompt engineer cannot control.",
+            "solution": "Employ a two-level strategy to create robust constraints. **Level 1: Internal Reinforcement (Triple-Pronged Approach):** 1. **Prioritization:** Explicitly state the rule's supreme importance ('This is your most important rule.'). 2. **Procedural Logic:** Frame the constraint as the first mandatory step in a workflow. 3. **Negative Exemplars:** Include examples where the constraint is correctly applied to an invalid input. **Level 2: External Awareness:** Recognize that prompts exist in a hierarchy. Systematically stress-test the constraint against inputs likely to trigger platform-level overrides. If an override is detected, either accept it as a platform limitation or re-architect the prompt's interaction model to avoid the trigger.",
+            "tags": [
+                "constraints",
+                "evaluation",
+                "negative-examples",
+                "robustness"
+            ],
+            "severity": "critical",
+            "related_lessons": [
+                4,
+                5,
+                53
+            ]
+        },
+        {
+            "id": 2,
+            "title": "Canonical Verbatim Copying for Asset Consistency",
+            "problem": "In sequential generation, an AI might slightly rephrase an asset's description for each new output to fit the context. These minor variations can cause a generative model to render the asset (e.g., a character's face) slightly differently each time, breaking visual identity.",
+            "solution": "Enforce a strict separation between an asset's unchanging canonical description and its temporary, in-scene action. The prompt must instruct the AI to copy the full canonical description **verbatim** into the relevant field (e.g., `actors.description`) for every instance, while the context-specific behavior is placed in a separate field (e.g., `actors.action`).",
+            "tags": [
+                "consistency",
+                "robustness",
+                "structured-output"
+            ],
+            "severity": "critical",
+            "related_lessons": [
+                30,
+                34,
+                36
+            ]
+        },
+        {
+            "id": 3,
+            "title": "Bypassing Structural Bias for Output Prefixes (The Brittle Constraint Fix)",
+            "problem": "Constraints that dictate the absolute start or end of the output (like a required prefix \"Context: \" or suffix) are often ignored if they conflict with the model's internal tendency to start with the first numbered or bulleted list item from the provided structure. This structural bias overrides high-priority instructions.",
+            "solution": "Do not rely on declarative instructions or even high-priority procedural steps to enforce a prefix/suffix if the model is ignoring them. Instead, reframe the output structure: remove the number/bullet point from the initial section, and integrate the required prefix/suffix directly into that section's title. This forces the model's inherent starting pattern to satisfy the output requirement.",
+            "tags": [
+                "constraints",
+                "robustness",
+                "structured-output"
+            ],
+            "severity": "critical",
+            "related_lessons": [
+                4,
+                15,
+                58
+            ]
+        },
+        {
+            "id": 4,
+            "title": "The Triple Reinforcement Pattern for Critical Outputs",
+            "problem": "LLMs may drop or ignore critical sections of a required output (e.g., a 'Conclusion' or 'User Stories' section), especially in long or complex prompts. A single instruction or a checklist item is often a fragile constraint.",
+            "solution": "Enforce the generation of critical sections using three synergistic methods: 1. **Procedural Command:** Explicitly command the model to create the section in the main workflow/instruction block. 2. **Structural Template:** Include a labeled placeholder for the section in the output format template. 3. **Quality Check:** Add a specific item to a quality checklist that verifies the section's presence and quality. This redundancy makes the constraint robust.",
+            "tags": [
+                "evaluation",
+                "robustness",
+                "structured-output"
+            ],
+            "severity": "critical",
+            "related_lessons": [
+                1,
+                15,
+                21
+            ]
+        },
+        {
+            "id": 5,
+            "title": "Adapting Prompts to External System Constraints",
+            "problem": "A prompt that is well-structured internally may still fail if it generates content that violates the Terms of Service or content policies of an external API or system it interacts with (e.g., an image generation model that blocks celebrity names).",
+            "solution": "Incorporate a specific <RULES> or <CONSTRAINTS> section that explicitly lists the limitations of the external system. Add negative constraints to the final output format (e.g., in a `negativePrompt` field) to reinforce these rules at the point of generation. This makes the prompt robust and compliant by design.",
+            "tags": [
+                "constraints",
+                "robustness",
+                "safety"
+            ],
+            "severity": "critical",
+            "related_lessons": [
+                1,
+                19,
+                53
+            ]
+        },
+        {
+            "id": 6,
+            "title": "The State Machine Protocol for Interactive Prompts",
+            "problem": "Complex prompts designed for a task may execute prematurely on their own internal examples, ignoring simple instructions to 'wait for user input'. The model's primary directive to perform its main task often overrides a passive 'wait' instruction.",
+            "solution": "Reframe the prompt from a one-shot script into an interactive agent governed by a state machine. Define distinct operational states (e.g., `STANDBY`, `AWAITING_COMMAND`, `PROCESSING`). Establish a mandatory, explicit activation command (e.g., `ANALYZE:`) that the user must provide to transition the model from a waiting state to a processing state. This creates a robust, predictable, and event-driven interaction flow.",
+            "tags": [
+                "agent-design",
+                "robustness",
+                "state-management",
+                "workflow"
+            ],
+            "severity": "critical",
+            "related_lessons": [
+                10,
+                35,
+                80
+            ]
+        },
+        {
+            "id": 7,
+            "title": "The Principle of Unified Intent: Aligning Persona, Objective, and Instructions",
+            "problem": "A prompt will produce suboptimal or unpredictable results if its core components are misaligned. For example, assigning a creative task (e.g., 'invent new details') to an 'analyst' persona, or pairing a generative objective with a constraint that forbids invention ('base your answer solely on the source text').",
+            "solution": "Ensure that the Persona (who the AI is), the Objective (what it's trying to achieve), the Instructions (the steps it takes), and the Constraints/Guidelines (its boundaries) are all in complete alignment and serve a single, unified purpose. When the fundamental task changes (e.g., from analysis to creation), create a new, purpose-built prompt with a fully realigned set of components rather than trying to adapt a misaligned one.",
+            "tags": [
+                "agent-design",
+                "consistency",
+                "expert-persona",
+                "goal-setting",
+                "prompt-architecture"
+            ],
+            "severity": "critical",
+            "related_lessons": [
+                8,
+                60,
+                73
+            ]
+        },
+        {
+            "id": 8,
+            "title": "The Compressor Pattern: Bridging Detailed Intent and Technical Constraints",
+            "problem": "Generating a high-quality prompt requires detailed, nuanced instructions, but the target tool or API has strict input limitations (e.g., character count) that prevent using the detailed prompt directly.",
+            "solution": "Implement a two-tier output system. First, instruct the AI to generate a full, unconstrained 'Director's Intent' or 'Ideal Output' that captures the complete creative or technical vision. Second, add a step where the AI acts as a 'prompt compressor,' creating a condensed, keyword-rich version of the intent that strictly adheres to the technical limitations, explicitly referencing the character limit as a hard constraint.",
+            "tags": [
+                "constraints",
+                "efficiency",
+                "workflow"
+            ],
+            "severity": "critical",
+            "related_lessons": [
+                7,
+                29,
+                60
+            ]
+        },
+        {
+            "id": 9,
+            "title": "The Intent Interception Pattern",
+            "problem": "A detailed system prompt with a complex workflow (e.g., conversational, analytical) can be completely bypassed if the user's input directly triggers a platform-level tool, such as an image generator (e.g., user says 'make a picture'). The platform's intent recognition takes precedence over the prompt's instructions.",
+            "solution": "Implement a high-priority, defensive protocol at the very beginning of the prompt's logic. This 'Intent Interception Protocol' must define specific trigger phrases (e.g., 'generate', 'create image') and provide a mandatory, canned response that blocks the default workflow. This response should re-direct the user to provide more suitable input, effectively capturing and reframing the user's intent before the platform can act on it.",
+            "tags": [
+                "goal-setting",
+                "prompt-architecture",
+                "robustness",
+                "workflow"
+            ],
+            "severity": "critical",
+            "related_lessons": [
+                7,
+                70,
+                72
+            ]
+        },
+        {
+            "id": 10,
+            "title": "The Explicit State Passing Protocol",
+            "problem": "Prompts for multi-turn tasks (e.g., iterative analysis, co-writing, planning) often fail because they incorrectly assume the LLM maintains a persistent internal memory or 'state' between turns. This leads to context decay, forgetting previous information, and process derailment.",
+            "solution": "Implement an 'Explicit State Passing' protocol. Instruct the AI to generate a dedicated, structured block (e.g., using XML or JSON) at the end of each turn. This 'state block' should contain a concise summary of all critical information and context accumulated so far. The user or controlling application is then responsible for copying this entire state block into the next prompt. This makes the conversation history the single source of truth for the task's state, ensuring perfect context retention and process integrity.",
+            "tags": [
+                "context-management",
+                "robustness",
+                "state-management",
+                "workflow"
+            ],
+            "severity": "critical",
+            "related_lessons": [
+                6,
+                24,
+                36
+            ]
+        },
+        {
+            "id": 11,
+            "title": "The Hardened Execution Mandate (Anti-Eagerness Fix)",
+            "problem": "In multi-phase workflows (like SDD, Plan -> Task -> Code), executor agents (like Qwen or Gemini CLI) exhibit an 'eagerness bias' to complete the entire job once they have sufficient context, ignoring phase limits like '/plan' and proceeding directly to '/implement' or '/tasks'. This bypasses critical human or quality gate approvals.",
+            "solution": "The output of the orchestrating agent (SpecSynth Architect) must generate a final command containing a 'blocking instruction'. This instruction must use **NEGATIVE CONSTRAINTS** (e.g., 'FORBIDDEN_FILES: tasks.md, implement.md') and an **EXPLICIT STOP PROTOCOL** (e.g., 'Immediately after generating plan.md, output the single phrase: PLANNING_COMPLETE_HALT and STOP'). This forces the executor to halt at the phase gate.",
+            "tags": [
+                "orchestration",
+                "robustness",
+                "workflow"
+            ],
+            "severity": "critical",
+            "related_lessons": [
+                9,
+                35,
+                44
+            ]
+        },
+        {
+            "id": 12,
+            "title": "Enforcing Valid Structured Output",
+            "problem": "Simply asking for a specific format like JSON or XML does not guarantee the output will be syntactically valid or conform to a required schema. The model may produce malformed structures, add conversational filler outside the code block, or omit required fields, making the output unusable for programmatic consumption.",
+            "solution": "Combine four techniques for robust structured output: 1. **Provide a Schema:** Define the required structure, including field names, data types, and optionality. 2. **Isolate the Output:** Forbid any explanatory text outside the final code block. 3. **Chain of Thought:** Instruct the model to first reason about the data it needs to populate and *then* render the final object. 4. **Provide a Valid Example:** Include one perfect example of the desired output structure.",
+            "tags": [
+                "robustness",
+                "structured-output"
+            ],
+            "severity": "critical",
+            "related_lessons": [
+                18,
+                21,
+                58
+            ]
+        },
+        {
+            "id": 13,
+            "title": "Description vs. Instruction",
+            "problem": "A prompt that only describes a persona, context, or role without an explicit command often results in the LLM summarizing the description instead of performing the desired task.",
+            "solution": "Always separate the context/persona from the task. Conclude the prompt with a clear, direct, and actionable command, such as 'Your task is to...' or 'Activate this persona now and perform the following...'. Use strong delimiters to separate description from instruction.",
+            "tags": [
+                "clarity",
+                "expert-persona",
+                "goal-setting"
+            ],
+            "examples": [],
+            "severity": "high",
+            "related_lessons": [
+                15,
+                22,
+                56
+            ]
+        },
+        {
+            "id": 14,
+            "title": "Preventing Factual Invention (Hallucination)",
+            "problem": "By default, LLMs are designed to be helpful and may generate plausible-sounding but factually incorrect information ('hallucinate') when they lack specific knowledge.",
+            "solution": "Implement explicit negative constraints, also known as 'honesty rules'. Clearly instruct the model on its behavior when it lacks knowledge. For example: 'If you do not know the answer, you MUST state that you do not have sufficient information. Do not invent facts.'",
+            "tags": [
+                "accuracy",
+                "constraints",
+                "robustness",
+                "safety"
+            ],
+            "examples": [],
+            "severity": "high",
+            "related_lessons": [
+                23,
+                39,
+                51
+            ]
+        },
+        {
+            "id": 15,
+            "title": "The Importance of Structural Delimiters",
+            "problem": "Unstructured, monolithic prompts make it difficult for the LLM to differentiate between background context, rules, examples, and the primary task, which can lead to it ignoring critical instructions.",
+            "solution": "Structure the prompt into logical, modular sections using clear delimiters (e.g., XML tags like <rules>, Markdown headers like ### Task, or JSON-like brackets). This improves the model's ability to parse and weigh instructions correctly and makes the prompt much easier to debug and maintain.",
+            "tags": [
+                "maintainability",
+                "prompt-architecture",
+                "structured-output"
+            ],
+            "examples": [],
+            "severity": "high",
+            "related_lessons": [
+                13,
+                22,
+                71
+            ]
+        },
+        {
+            "id": 16,
+            "title": "The Multi-Agent Persona",
+            "problem": "For complex tasks with multiple sequential steps (e.g., analysis, planning, execution), a monolithic prompt where the AI does everything at once can lead to unstable results, missed steps, or incorrect formatting.",
+            "solution": "Instead of a single role, define several specialized 'internal agents' within the prompt (e.g., Auditor, Strategist, Architect). Create a strict, sequential workflow where the output of one agent is the input for the next. This forces the model to execute the task methodically, improving reliability and quality.",
+            "tags": [
+                "prompt-architecture",
+                "robustness",
+                "task-decomposition",
+                "workflow"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                29,
+                46,
+                63
+            ]
+        },
+        {
+            "id": 17,
+            "title": "Multi-Layered Language Control",
+            "problem": "Когда промпт должен обрабатывать несколько языков (например, пользовательский ввод на одном языке, внутренние рассуждения ИИ на другом и конечный вывод на третьем), модель может запутаться и смешать языки, особенно в сложных задачах. Это снижает надежность и предсказуемость.",
+            "solution": "В самом начале взаимодействия установите строгий, не подлежащий обсуждению **языковой протокол**. Этот протокол должен четко разделять языки для разных уровней работы ИИ. Такой подход превращает языковые правила из простой инструкции в фундаментальную 'операционную систему' для диалога.\n\n**Ключевые компоненты протокола:**\n1.  **`INTERNAL_COGNITION_LANGUAGE` (Язык внутреннего мышления):** Язык для анализа, рассуждений и построения логики. Рекомендуется использовать английский, так как он обычно имеет самое широкое представление в обучающих данных модели, что повышает качество сложного анализа.\n2.  **`USER_DIALOGUE_LANGUAGE` (Язык диалога с пользователем):** Язык, на котором ИИ должен вести весь диалог с пользователем (объяснения, отчеты, вопросы).\n3.  **`ARTIFACT_LANGUAGE` (Язык артефактов):** Правило для неизменяемых данных, таких как код, примеры промптов или прямые цитаты. Обычно они должны оставаться на своем исходном языке (чаще всего, английском).",
+            "tags": [
+                "localization",
+                "meta-prompting",
+                "robustness"
+            ],
+            "examples": [
+                "\"<SYSTEM_PROMPT>\\n\\n<META_DIRECTIVE name=\\\"LANGUAGE_PROTOCOL\\\">\\nThis is a strict, non-negotiable protocol:\\n1.  **INTERNAL_COGNITION**: All internal reasoning and analysis MUST be in **ENGLISH**.\\n2.  **USER_DIALOGUE**: All final reports and explanations for the user MUST be in **RUSSIAN**.\\n3.  **PROMPT_ARTIFACTS**: All generated prompt examples and code blocks MUST remain in **ENGLISH**.\\n</META_DIRECTIVE>\\n\\n<ROLE>You are a code debugger.</ROLE>\\n\\n<TASK>Analyze the user's Python code, explain the error in Russian, and provide the corrected code block.</TASK>\\n\\n</SYSTEM_PROMPT>\""
+            ],
+            "severity": "high",
+            "related_lessons": [
+                50,
+                52,
+                62
+            ]
+        },
+        {
+            "id": 18,
+            "title": "Explicit Formatting for Machine-Readable Output",
+            "problem": "If a prompt requires the generation of structured data (JSON, XML, CSV) but does not define the exact output format (e.g., presence of a root element, use of an array), the LLM may produce output that is syntactically valid but semantically unusable for direct integration, requiring manual editing.",
+            "solution": "Always include a section with strict, technically precise constraints on the output format ('Output Constraint'). For example, instead of 'Provide a valid JSON,' use 'Provide a JSON object. The root element MUST be 'data'.' For insertions into existing files, specify the exact fragment format, such as: 'The output must be a sequence of comma-separated JSON objects without a containing array `[]`.'",
+            "tags": [
+                "robustness",
+                "structured-output"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                12,
+                21,
+                58
+            ]
+        },
+        {
+            "id": 19,
+            "title": "Reinforcing Constraints with Procedural Logic",
+            "problem": "Negative or prohibitive constraints (e.g., 'Do not do X') are often less effective because they tell the model what to avoid without providing a clear alternative action. This can lead to the model ignoring the constraint or misinterpreting it, especially in complex prompts.",
+            "solution": "Convert prohibitive commands into procedural, positive instructions using 'If-Then' logic. Instead of merely forbidding an action, define a constructive rule that guides the model's behavior. For example, instead of 'Do not apologize,' use the more robust instruction: 'If the user's feedback is negative, analyze it for specifics but do not offer an apology.' This transforms the constraint into an actionable, context-aware rule.",
+            "tags": [
+                "constraints",
+                "control-flow",
+                "quality-assurance",
+                "robustness"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                5,
+                23,
+                53
+            ]
+        },
+        {
+            "id": 20,
+            "title": "The Diagnostic Power of Stress-Testing",
+            "problem": "A prompt may seem to work correctly under ideal conditions, but its hidden flaws (e.g., weak constraints, ambiguous rules) only become apparent when faced with edge cases or deliberately challenging inputs.",
+            "solution": "Systematically test a prompt's performance by designing test cases that target its constraints and rules. Use out-of-scope requests, requests with high complexity, and ambiguous queries. Analyzing the failures in these stress tests is the most effective way to diagnose underlying weaknesses in the prompt's logic and identify where simple prohibitions need to be replaced with robust procedural instructions.",
+            "tags": [
+                "constraints",
+                "evaluation",
+                "quality-assurance",
+                "robustness"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                1,
+                53,
+                70
+            ]
+        },
+        {
+            "id": 21,
+            "title": "Enforcing Consistent Output with a Format Template",
+            "problem": "Without explicit formatting instructions, an LLM will generate responses that vary in structure from one execution to the next. This makes the output unpredictable, difficult to read consistently, and unusable for automated parsing.",
+            "solution": "Include a mandatory `OUTPUT_FORMAT` section in the prompt. Provide a rigid template using a clear syntax like Markdown, specifying headings, bullet points, and placeholders (e.g., `**Word:** [The user's word]`). This forces the model to populate a pre-defined structure instead of creating its own, ensuring perfect consistency across all responses.",
+            "tags": [
+                "consistency",
+                "robustness"
+            ],
+            "examples": [],
+            "severity": "high",
+            "related_lessons": [
+                12,
+                18,
+                58
+            ]
+        },
+        {
+            "id": 22,
+            "title": "System Prompt as Configuration",
+            "problem": "As prompts grow in complexity, using simple headers and natural language can lead to ambiguity. The LLM may struggle to differentiate between background context, strict rules, examples, and the core task.",
+            "solution": "Structure the entire prompt like a configuration file using clear, hierarchical tags (e.g., XML-like tags such as `<ROLE>`, `<RULES>`, `<TASK>`). This forces the model to parse the prompt in a structured way, dramatically improving reliability, modularity, and clarity by treating each block as a distinct computational component.",
+            "tags": [
+                "modularity",
+                "prompt-architecture",
+                "robustness"
+            ],
+            "examples": [
+                "Instead of 'Rules: Don't do X.', use '<RULES>\\n1. You MUST NOT do X.\\n</RULES>'."
+            ],
+            "severity": "high",
+            "related_lessons": [
+                15,
+                61,
+                71
+            ]
+        },
+        {
+            "id": 23,
+            "title": "The 'Helpful Refusal' Pattern",
+            "problem": "Simple prohibitive constraints (e.g., 'Do not answer X') often fail because they conflict with the LLM's fundamental training to be helpful. This can cause the model to bypass the rule. Furthermore, a simple refusal like 'I cannot do that' creates a dead-end for the user without offering a path forward.",
+            "solution": "Design constraints as a 'refuse, explain, and guide' procedure. This redirects the LLM's helpfulness bias into a safe and productive path. The model must: 1. **Refuse:** Clearly state the limitation or boundary. 2. **Explain:** Specify exactly WHAT information is missing or WHY the request is out of scope. 3. **Guide:** Provide constructive, alternative assistance, such as explaining the methodology for how one would find the answer or giving examples of what a valid request would look like.",
+            "tags": [
+                "constraints",
+                "interaction-design",
+                "robustness"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                19,
+                53,
+                67
+            ]
+        },
+        {
+            "id": 24,
+            "title": "The Stateful Workflow Pattern",
+            "problem": "LLMs are inherently stateless, which makes complex, multi-stage tasks difficult. Without an explicit, managed process, the model can lose context between turns, repeat work, or fail to follow a required sequence of operations, leading to inconsistent or incomplete results.",
+            "solution": "To enforce reliable, step-by-step execution, define a formal, state-managed process using a `<WORKFLOW>` block. Decompose the entire task into discrete `<STEP>`s, each with a clear objective. The core instruction is for the model to execute only *one* step per turn, output its result, and then use a `HALT` command. This creates a turn-based, stateful interaction where the workflow's progress can be reliably controlled, inspected, and continued in the next prompt.",
+            "tags": [
+                "chain-of-thought",
+                "control-flow",
+                "state-management",
+                "task-decomposition",
+                "workflow"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                6,
+                10,
+                63
+            ]
+        },
+        {
+            "id": 25,
+            "title": "Isolating Examples from Instructions",
+            "problem": "When a prompt contains examples (`<example>`), especially those with user input fields, the model may misinterpret the example as part of the current task and execute it immediately, ignoring instructions to wait for the actual user's input.",
+            "solution": "Wrap examples in explicit meta-instruction tags that clearly label them as non-executable, reference material. This creates a clear boundary between the instructions to be followed and the examples provided for guidance. For instance: `<META_INSTRUCTION>The following is a reference example for tone and format only. Do not act on it.</META_INSTRUCTION><EXAMPLE>...</EXAMPLE>`.",
+            "tags": [
+                "prompt-architecture",
+                "workflow"
+            ],
+            "examples": [
+                "\"<META_INSTRUCTION>This is a reference, not a command.</META_INSTRUCTION>\\n<EXAMPLE>... A full example ...</EXAMPLE>\""
+            ],
+            "severity": "high",
+            "related_lessons": [
+                37,
+                41,
+                74
+            ]
+        },
+        {
+            "id": 26,
+            "title": "The Adaptive Assistant Pattern (Analyze and Fill Gaps)",
+            "problem": "A prompt designed to 'enrich' or 'complete' user input with a fixed procedure can fail when the user provides specific details that conflict with that procedure, leading the AI to override or ignore user input.",
+            "solution": "Implement a conditional workflow. 1. **Analyze:** First, deconstruct the user's input to identify the components they have already provided. 2. **Identify Gaps:** Compare the provided components against an ideal template to see what's missing. 3. **Enrich Conditionally:** Add information *only* to fill the identified gaps, leaving the user's original contributions untouched.",
+            "tags": [
+                "control-flow",
+                "goal-setting",
+                "workflow"
+            ],
+            "examples": [
+                "\"<WORKFLOW>1. Deconstruct the user's input to find the core subject and any specified styles. 2. Identify Gaps: Check if the user mentioned a medium, environment, or color scheme. 3. Intellectual Enrichment: For EACH MISSING element, select one from the Knowledge Base to add. If the user already specified a medium, DO NOT add another one.</WORKFLOW>\""
+            ],
+            "severity": "high",
+            "related_lessons": [
+                60,
+                70,
+                72
+            ]
+        },
+        {
+            "id": 27,
+            "title": "The Versioned Configuration Block",
+            "problem": "A prompt that interacts with an external, evolving system (like an API or a specific software version) becomes obsolete when that system is updated, as its hardcoded rules and parameters may no longer be valid.",
+            "solution": "Isolate all version-specific information (e.g., version numbers, compatible parameters, syntax rules) into a distinct, clearly delimited configuration block at the top of the prompt (e.g., `<latest_api_version_info>`). Instruct the AI to treat this block as the single source of truth for the external system's current state. This allows for easy updates without altering the prompt's core logic.",
+            "tags": [
+                "maintainability",
+                "modularity"
+            ],
+            "examples": [
+                "\"<latest_mj_version_info>- The current primary model is Midjourney v7. - Your generated prompts must reflect the rules and syntax for v7. - Multi-prompts (::) have limited compatibility; prefer natural language structure.</latest_mj_version_info>\""
+            ],
+            "severity": "high",
+            "related_lessons": [
+                61,
+                71,
+                76
+            ]
+        },
+        {
+            "id": 28,
+            "title": "Forcing Verifiability with Traceability Requirements",
+            "problem": "An AI's analysis can be difficult to verify, appearing as a 'black box' conclusion. This makes it hard to trust the output or debug errors without manually retracing the AI's steps.",
+            "solution": "Incorporate a strict rule that requires the AI to cite a specific source for every key piece of information it generates. For tasks involving code or document analysis, this means referencing the exact file name, function, or line number. This transforms the output from a set of claims into a verifiable, auditable document.",
+            "tags": [
+                "accuracy",
+                "evaluation"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                2,
+                39,
+                75
+            ]
+        },
+        {
+            "id": 29,
+            "title": "The Orchestrator-Specialist Pattern",
+            "problem": "Complex, multi-stage workflows (e.g., creative brief -> technical spec -> final output) are difficult to manage in a single prompt. A monolithic AI can confuse its roles as a creative partner and a technical executor.",
+            "solution": "Decompose the workflow across multiple, specialized AI agents (prompts). Design a high-level 'Orchestrator' AI (e.g., a 'Producer') that manages the user interaction and project state. This Orchestrator then generates precise commands to trigger subordinate 'Specialist' AIs (e.g., a 'JSON Generator') that handle the technical execution. This creates a clean separation of concerns.",
+            "tags": [
+                "agent-design",
+                "orchestration",
+                "task-decomposition",
+                "workflow"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                8,
+                16,
+                60
+            ]
+        },
+        {
+            "id": 30,
+            "title": "The Global Guideline for Sequential Generation",
+            "problem": "When generating a sequence of outputs (e.g., video shots, document chapters), an AI may make inconsistent creative choices for each piece, treating them as isolated tasks. This breaks the overall stylistic and narrative cohesion.",
+            "solution": "Implement a two-phase process. In the first phase ('canonization'), instruct the AI to not only catalog assets but also to analyze them and generate a `<GLOBAL_STYLE_GUIDE>`. In the second phase ('generation'), add a strict rule that the AI MUST adhere to this pre-defined guide for every subsequent output it creates.",
+            "tags": [
+                "consistency",
+                "state-management"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                2,
+                31,
+                36
+            ]
+        },
+        {
+            "id": 31,
+            "title": "The 'Roger Rabbit Rule' for Controlled Stylistic Hybridity",
+            "problem": "Integrating assets of conflicting styles (e.g., a cartoon character in a photorealistic world) often leads to jarring, inconsistent outputs, as the AI struggles to reconcile the styles.",
+            "solution": "Instead of forcing one style, define rules for hybridity. Instruct the AI to establish a 'dominant' style (e.g., `cinematic`). Then, for any 'exception' asset (e.g., a cartoon character), enforce a specific integration rule. The most critical rule is for lighting: 'The exception asset MUST be lit by the realistic lighting of the dominant environment and MUST cast accurate shadows and receive reflections.'",
+            "tags": [
+                "consistency"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                30,
+                36,
+                66
+            ]
+        },
+        {
+            "id": 32,
+            "title": "The Localization Block Pattern for Multilingual Prompts",
+            "problem": "Hardcoding user-facing strings (headers, messages, labels) directly into a prompt makes it difficult to adapt for different languages. Translating it requires finding and replacing multiple strings, which is error-prone and inefficient.",
+            "solution": "Isolate all user-facing strings into a dedicated `<LOCALIZATION>` block with nested structures for each language (e.g., `<STRINGS lang='English'>...`). Instruct the model to select the appropriate set of strings based on a configuration variable (e.g., `{{TARGET_LANGUAGE}}`). This separates logic from presentation, making the prompt modular and easily localizable.",
+            "tags": [
+                "localization",
+                "modularity"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                59,
+                62,
+                77
+            ]
+        },
+        {
+            "id": 33,
+            "title": "Elevating from Description to Analytical Synthesis",
+            "problem": "When tasked with a general analysis, an LLM might default to simple description, summarization, or data extraction (e.g., listing files, summarizing text). This is often a low-value task that fails to produce the higher-order insights the user actually needs.",
+            "solution": "To elicit deeper reasoning, explicitly reframe the task from 'analysis' to 'synthesis.' Instruct the model to create a specific, structured artifact that requires transforming the source material. For example, instead of 'Analyze this code,' use a more demanding command like 'Generate a Data Mapping table by analyzing these database migration files.' This forces the model to perform a more valuable cognitive task of transformation and synthesis.",
+            "tags": [
+                "evaluation",
+                "expert-persona",
+                "structured-output"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                39,
+                51,
+                78
+            ]
+        },
+        {
+            "id": 34,
+            "title": "Structured Attribute Checklists for Canonization",
+            "problem": "When generating consistent characters or objects across multiple scenes, using subjective analogies (e.g., 'a car that looks like a Batmobile') can be unreliable and may violate content policies.",
+            "solution": "Instead of analogies, define canonical elements using a structured checklist of objective, physical attributes. For a character, this would include specific fields for hair, eyes, clothing, etc. For a location, it would include layout, key objects, and materials. This 'sketch artist' approach provides a more robust and reproducible source of truth for the model.",
+            "tags": [
+                "consistency"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                2,
+                30,
+                31
+            ]
+        },
+        {
+            "id": 35,
+            "title": "Enforcing Delayed Execution (The Eagerness Fix)",
+            "problem": "Models often execute tasks immediately upon parsing a detailed prompt if the prompt ends with a template or a completed set of instructions without a clear, final command to 'wait for input' or 'execute upon receiving the target data.' This leads to the model attempting to run the task using the prompt itself as input.",
+            "solution": "Implement a final, mandatory, and strongly-delimited section—the <EXECUTION_PROTOCOL>—at the very end of the prompt. This section MUST contain the explicit instruction to wait for the user-provided data (e.g., a <TRANSCRIPT> block) before generating the final output. This overrides the model's eagerness to self-execute.",
+            "tags": [
+                "control-flow",
+                "goal-setting",
+                "robustness"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                6,
+                11,
+                80
+            ]
+        },
+        {
+            "id": 36,
+            "title": "The Canon Lock Pattern",
+            "problem": "In multi-turn creative or technical conversations, an AI may generate details in later turns that contradict the foundational information it established in earlier turns. This 'contextual drift' undermines the logical consistency of the generated world, plan, or character.",
+            "solution": "Explicitly designate the initial generated artifact as the 'canon' or 'source of truth'. In the instructions for all subsequent conversational turns (like a 'deep dive'), include a high-priority, critical constraint that all new information MUST be strictly consistent with this established canon. This 'locks' the context, ensuring all elaborations enrich the foundation rather than contradicting it.",
+            "tags": [
+                "consistency",
+                "context-management",
+                "robustness",
+                "state-management"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                2,
+                30,
+                31
+            ]
+        },
+        {
+            "id": 37,
+            "title": "The Example Contamination Flaw",
+            "problem": "A prompt that includes a detailed, well-formatted example of its own output can inadvertently trigger itself. The LLM may misinterpret the high-quality example as a live task to be performed immediately, especially if the example contains clear input/output markers like `<UserInput>`.",
+            "solution": "Isolate examples semantically and structurally. Rename example-specific tags (e.g., `<UserInput>` to `<ExampleInput>`). More robustly, place the entire example section within a meta-instruction that clearly labels it as 'for internal reference only'. This method is most effective when combined with a stateful protocol, like the State Machine Protocol, to prevent execution.",
+            "tags": [
+                "few-shot-prompting",
+                "maintainability"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                25,
+                41,
+                74
+            ]
+        },
+        {
+            "id": 38,
+            "title": "The Conditional Logic Pattern: Building Multi-Modal Prompts",
+            "problem": "Creating separate, highly specialized prompts for slightly different but related tasks (e.g., analyzing a video vs. analyzing an image) is inefficient and difficult to maintain. A single prompt trying to handle all cases without guidance may apply the wrong logic to an input.",
+            "solution": "Implement explicit conditional logic within the prompt's instructions. Add a procedural step at the beginning, such as: 'Step 0: Identify the input type (e.g., video, image, or text). Based on the type, follow the specific instructions outlined for that type in the subsequent steps.' This creates a single, robust, and versatile prompt that can route its own behavior, effectively acting like a software function with a switch-case statement.",
+            "tags": [
+                "agent-design",
+                "control-flow",
+                "prompt-architecture",
+                "robustness"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                15,
+                22,
+                71
+            ]
+        },
+        {
+            "id": 39,
+            "title": "Internalizing Expertise: Embedding a Knowledge Base",
+            "problem": "For specialized tasks, an LLM's general training data is often too broad, outdated, or lacks the necessary domain-specific information, resulting in generic, inconsistent, or inaccurate responses. Simply providing this information as background context is unreliable, as the model may not consistently use it as the primary framework for its reasoning.",
+            "solution": "To ensure deep, consistent, and domain-specific reasoning, embed a dedicated and structured `<KNOWLEDGE_BASE>` section within the prompt. This section should contain the core principles, definitions, facts, or rules for the task. Critically, you must then explicitly instruct the AI persona to ground all of its reasoning, analysis, and actions in this internal knowledge base. This transforms passive information into active operational logic, forcing the model to operate as a domain expert.",
+            "tags": [
+                "accuracy",
+                "chain-of-thought",
+                "context-management",
+                "expert-persona",
+                "knowledge-grounding",
+                "prompt-architecture",
+                "quality-assurance"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                33,
+                50,
+                73
+            ]
+        },
+        {
+            "id": 40,
+            "title": "Proactive Framing and Role Assertion",
+            "problem": "If a prompt for a specialized AI agent waits passively for user input, the user may interact with it as if it were a general-purpose assistant, leading to incorrect behavior. The agent's specialized role and workflow are not immediately obvious.",
+            "solution": "Design the AI agent to be proactive. Its very first action in a new conversation should be to issue an 'Opening Statement'. This statement must clearly define its role, its purpose, its limitations (e.g., 'I am a prompt-builder, not an image generator'), and how the user should interact with it. This frames the entire conversation and manages user expectations from the start.",
+            "tags": [
+                "expert-persona",
+                "interaction-design"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                6,
+                16,
+                72
+            ]
+        },
+        {
+            "id": 41,
+            "title": "The Pristine Example Principle",
+            "problem": "Few-shot examples in a prompt contain helpful meta-commentary, notes, or formatting (like separators) intended for the human reader. The LLM does not differentiate between the example content and the meta-commentary, leading it to replicate the unwanted text in its own output.",
+            "solution": "Treat every example as a literal, character-for-character template of the desired output. Ruthlessly purge any text or formatting that should not appear in the final response. The examples must be 'pristine' and perfectly conform to the prompt's output constraints. If an explanation is needed, place it outside the example block itself.",
+            "tags": [
+                "clarity",
+                "few-shot-prompting",
+                "structured-output"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                37,
+                49,
+                81
+            ]
+        },
+        {
+            "id": 42,
+            "title": "The Vulnerability of Static Examples (Few-Shot Overfitting)",
+            "problem": "When using examples (few-shot) in a prompt, especially in combination with modular templates (e.g., a localization block), the model may 'overfit' to the example. It starts to exactly copy the structure and static values from the example, ignoring more complex instructions to dynamically assemble the output from variables.",
+            "solution": "Be aware that for the model, the signal from a concrete, well-structured example can be stronger than that from an abstract template. Use testing to identify this behavior. If the problem is detected, the solution is to make the example itself dynamic, as described in Lesson #81.",
+            "tags": [
+                "few-shot-prompting",
+                "modularity",
+                "prompt-architecture",
+                "robustness"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                43,
+                74,
+                79
+            ]
+        },
+        {
+            "id": 43,
+            "title": "The 'Dynamic Example' Pattern for Consistency",
+            "problem": "A static example in a modular prompt creates a conflict of instructions. The model does not understand what to prioritize: the output template (`<DeliverablesFormat>`) or the example's structure (`<Example>`).",
+            "solution": "Make the example part of the modular system. Instead of hard-coding text in the `<SampleOutput>` block, use the same variables/placeholders that are defined in the output template (`<DeliverablesFormat>`) and the localization block (`<Localization>`). This resolves the conflict and turns the example into an additional reinforcement of the correct use of the modular structure.",
+            "tags": [
+                "consistency",
+                "few-shot-prompting",
+                "modularity",
+                "prompt-architecture"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                21,
+                42,
+                74
+            ]
+        },
+        {
+            "id": 44,
+            "title": "The Explicit Agent Delegation Pattern",
+            "problem": "In multi-agent systems (like Roo Code), the system orchestrator may fail to automatically transition between specialized agents (e.g., Architect -> Developer), causing the wrong agent to receive and incorrectly process the next command (e.g., the Architect receives /specify).",
+            "solution": "The orchestrating prompt's final output must include a **DELEGATION_MANDATE** block that explicitly specifies the next required agent and command, formatted for the system orchestrator. This block should contain the target agent (e.g., 'NEXT_AGENT_ROLE: DEVELOPER_AGENT') and the exact, executable command line. This externalizes the agent switch, making the workflow predictable.",
+            "tags": [
+                "agent-design",
+                "modularity",
+                "orchestration",
+                "workflow"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                11,
+                16,
+                63
+            ]
+        },
+        {
+            "id": 45,
+            "title": "Constitutional Risk Recalibration Protocol",
+            "problem": "When an agent discovers a critical mismatch (e.g., a project baseline is 2.9% coverage, but the constitutional goal is 65%), it often halts or demands manual intervention, blocking the entire process (Copilot failure).",
+            "solution": "The prompt must include an internal, procedural protocol that forces the agent to automatically propose a solution for the constitutional breach. This involves a three-tier response: 1) Document the numeric discrepancy. 2) Propose a pragmatic, Phased Approach (e.g., 75% target to unblock). 3) Generate an executable command to formally amend or clarify the plan/constitution, preventing a blockage while ensuring the goal is still met incrementally.",
+            "tags": [
+                "goal-setting",
+                "robustness",
+                "safety",
+                "self-correction",
+                "task-decomposition"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                1,
+                47,
+                48
+            ]
+        },
+        {
+            "id": 46,
+            "title": "The 'Internal Crew' Meta-Pattern",
+            "problem": "A single agent tasked with a complex, multi-stage cognitive process (like analysis, design, and review) may fail to apply sufficient rigor at each stage, leading to shallow or flawed outputs.",
+            "solution": "Structure the prompt to define an internal, virtual 'crew' of specialized sub-agents. Assign distinct roles and responsibilities to each (e.g., 'Analyst', 'Architect', 'Critic', 'QA'). The prompt should then define a workflow or sequence for how these internal agents interact to produce the final result. This simulates a more robust cognitive process through explicit role-playing.",
+            "tags": [
+                "agent-design",
+                "expert-persona",
+                "meta-prompting"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                16,
+                29,
+                63
+            ]
+        },
+        {
+            "id": 47,
+            "title": "The Architectural Refactoring Principle",
+            "problem": "When a prompt suffers from multiple, systemic issues (e.g., inconsistent formatting, mixed modes of instruction, implicit logic), fixing them one by one can result in a 'patchwork' solution that is still fragile and hard to maintain.",
+            "solution": "During the 'Strategist' phase, if the number or nature of issues points to a foundational weakness, prioritize an architectural refactoring over individual fixes. Propose a complete restructuring based on a robust pattern (e.g., 'Everything as XML,' see Lesson #39). This approach ensures the final prompt is not only correct but also clean, consistent, and scalable.",
+            "tags": [
+                "maintainability",
+                "prompt-architecture",
+                "quality-assurance",
+                "refactoring",
+                "scalability"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                7,
+                48,
+                71
+            ]
+        },
+        {
+            "id": 48,
+            "title": "The Self-Critique and Correction Pattern",
+            "problem": "For complex tasks, an LLM's initial, single-pass response may contain factual errors, logical inconsistencies, or fail to adhere to all specified constraints. Relying on this first draft often leads to suboptimal or incorrect outcomes.",
+            "solution": "Implement a mandatory two-step process within the prompt's workflow. First, instruct the model to generate its initial response or artifact. Second, explicitly command it to switch to a 'Critic' or 'QA Analyst' role, evaluate its own output against a provided checklist of criteria (e.g., accuracy, constraint adherence, clarity), identify any flaws, and then generate a final, corrected version. This enforces a deliberate refinement cycle.",
+            "tags": [
+                "accuracy",
+                "chain-of-thought",
+                "quality-assurance",
+                "robustness",
+                "self-correction",
+                "workflow"
+            ],
+            "severity": "high",
+            "related_lessons": [
+                1,
+                4,
+                51
+            ]
+        },
+        {
+            "id": 49,
+            "title": "Guiding Behavior with Few-Shot Examples",
+            "problem": "Complex instructions regarding tone, format, or logic can be interpreted inconsistently by the LLM, leading to unreliable or poorly formatted outputs.",
+            "solution": "Provide a set of high-quality examples (Few-Shot Learning) directly within the prompt. These examples should demonstrate the desired input-output behavior, including how to handle both typical and edge-case scenarios (e.g., an invalid user request).",
+            "tags": [
+                "consistency",
+                "few-shot-prompting"
+            ],
+            "examples": [],
+            "severity": "medium",
+            "related_lessons": [
+                41,
+                55,
+                79
+            ]
+        },
+        {
+            "id": 50,
+            "title": "Managing Multilingual and Meta-Cognitive Tasks",
+            "problem": "Controlling the language of an LLM's response is straightforward, but controlling its internal 'thought process' language or other meta-tasks requires a more advanced setup.",
+            "solution": "Create an explicit 'Protocol' or 'Procedure' section. Define distinct rules for different cognitive layers. For example: 'Language Protocol: Your internal reasoning must be in English and enclosed in <thinking> tags. All final responses to the user must be in Russian.' This allows for complex workflows like structured reasoning.",
+            "tags": [
+                "chain-of-thought",
+                "localization",
+                "meta-prompting"
+            ],
+            "examples": [],
+            "severity": "medium",
+            "related_lessons": [
+                57,
+                59,
+                62
+            ]
+        },
+        {
+            "id": 51,
+            "title": "Process over Personality",
+            "problem": "Requesting an LLM to 'be an expert' or 'be meticulous' is declarative and subjective, leading to unpredictable performance as the model's interpretation can vary.",
+            "solution": "Instead of describing desired personality traits, design an operational process that inevitably produces a result with those traits. For example, instead of 'be analytical,' enforce a mandatory process: 'The Auditor finds problems -> The Strategist proposes solutions.' The outcome will be inherently analytical.",
+            "tags": [
+                "consistency",
+                "workflow"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                16,
+                39,
+                48
+            ]
+        },
+        {
+            "id": 52,
+            "title": "The Command Interface",
+            "problem": "In complex, long-term interaction prompts, the AI can become confused about user intent, failing to distinguish between a primary task request, a request for help, or a debugging attempt.",
+            "solution": "Implement a formal 'command interface' (e.g., /analyze, /retrospective, /debug_report). This structures the dialogue, makes the agent's capabilities explicit, and allows the user to precisely control its behavior by switching it into different operational modes.",
+            "tags": [
+                "interaction-design",
+                "state-management"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                6,
+                40,
+                64
+            ]
+        },
+        {
+            "id": 53,
+            "title": "Exemplifying Constraint Handling",
+            "problem": "Even with a clear rule, the LLM may interpret *how* to follow it in an undesirable way (e.g., being too blunt, or leaking information while refusing a task).",
+            "solution": "Within your prompt's 'Examples' section, include a specific demonstration of the desired behavior when a constraint is triggered. Provide a sample user query that violates a rule and the exact, ideal response the AI should give. This models not just the rule, but also the tone and execution of its enforcement.",
+            "tags": [
+                "constraints",
+                "few-shot-prompting",
+                "interaction-design"
+            ],
+            "examples": [],
+            "severity": "medium",
+            "related_lessons": [
+                1,
+                5,
+                19
+            ]
+        },
+        {
+            "id": 54,
+            "title": "Parametric Inputs for Dynamic Prompts",
+            "problem": "A hard-coded prompt that works for a single use-case is not reusable. Subjective instructions like 'explain simply' lead to inconsistent output because the model's interpretation varies.",
+            "solution": "Abstract key variables from the prompt and define them as explicit input parameters (e.g., using placeholders like `{{VARIABLE_NAME}}`). This transforms a static prompt into a dynamic, reusable template that can be adapted to different needs by changing only the input values, leading to more consistent and flexible behavior.",
+            "tags": [
+                "consistency",
+                "modularity",
+                "prompt-architecture"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                22,
+                71,
+                79
+            ]
+        },
+        {
+            "id": 55,
+            "title": "Matching Example Complexity to Task Demands",
+            "problem": "An LLM may follow instructions for simple cases but fail on more complex ones, even if the rule is universal. This often happens when the provided few-shot examples are too simplistic and do not reflect the complexity of real-world use cases.",
+            "solution": "Ensure that the examples (`few-shot`) provided in the prompt are of a complexity that is representative of the most challenging tasks the LLM is expected to perform. If the task involves complex formatting (e.g., nested JSON, detailed LaTeX), the example must also demonstrate that complex formatting to serve as a reliable blueprint.",
+            "tags": [
+                "few-shot-prompting",
+                "quality-assurance",
+                "robustness"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                15,
+                49,
+                79
+            ]
+        },
+        {
+            "id": 56,
+            "title": "Quantifying Subjective Instructions",
+            "problem": "Instructions that use subjective or relative terms like 'brief', 'simple', 'a few', or 'detailed' lead to inconsistent outputs because the LLM's interpretation of these terms varies with each run and context.",
+            "solution": "Replace subjective descriptors with concrete, measurable constraints. Instead of 'write a brief summary,' use 'write a summary in 3-5 sentences.' Instead of 'add a few examples,' use 'provide exactly 2 examples.' This transforms a vague request into a verifiable instruction, dramatically improving consistency.",
+            "tags": [
+                "clarity",
+                "consistency",
+                "robustness"
+            ],
+            "examples": [],
+            "severity": "medium",
+            "related_lessons": [
+                13,
+                49,
+                55
+            ]
+        },
+        {
+            "id": 57,
+            "title": "Rule-Based Language Compliance",
+            "problem": "While an LLM can often infer the desired output language from the user's query, this is not guaranteed, especially in complex, multi-turn dialogues or with very structured prompts.",
+            "solution": "Formalize language handling as an explicit, numbered rule within a `<RULES>` block. For example: '2. You MUST respond in the same language as the user's request.' This elevates language compliance from an inference to a strict, non-negotiable instruction, ensuring reliable multilingual performance.",
+            "tags": [
+                "constraints",
+                "localization",
+                "robustness"
+            ],
+            "examples": [
+                "'<RULES>\\n1. [Some other rule]\\n2. Language: You must generate the entire response in the same language the user used in their last prompt.\\n</RULES>'"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                50,
+                59,
+                62
+            ]
+        },
+        {
+            "id": 58,
+            "title": "Forcing Strict Format Compliance",
+            "problem": "Even when a detailed `<OUTPUT_FORMAT>` is provided, a model may deviate and use its own internal schema for a common task (e.g., generating a 'business report' with its own headers instead of the ones specified), as its training for that format is very strong.",
+            "solution": "Reinforce the formatting instruction with an explicit, high-priority command that emphasizes absolute accuracy. Instead of just showing the format, add a rule like: 'Your response MUST follow the provided format with 100% accuracy. Do not add, remove, or rename any headers from the template.' This elevates the format from a suggestion to a non-negotiable constraint.",
+            "tags": [
+                "consistency",
+                "robustness",
+                "structured-output"
+            ],
+            "examples": [
+                "\"<TASK>... Your response MUST use the exact headers and structure defined in <OUTPUT_FORMAT>. This is your highest priority.</TASK>\""
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                12,
+                18,
+                21
+            ]
+        },
+        {
+            "id": 59,
+            "title": "Multi-Lingual Input Gateway",
+            "problem": "A prompt needs to accept user input in multiple, predefined languages (e.g., Russian, English, Chinese) but must consistently produce its output in a single, different target language (e.g., English for an API call). The model might mistakenly adopt the input language for its response.",
+            "solution": "Define an explicit 'language gateway' rule. This involves two parts: 1) Clearly list all acceptable input languages. 2) State with absolute certainty the single, non-negotiable output language. Combine this with an error handling rule for any unsupported input languages.",
+            "tags": [
+                "localization",
+                "robustness"
+            ],
+            "examples": [
+                "\"<RULES>1. **Accepted Input Languages:** Your instructions can be provided in Russian, English, or Chinese. 2. **Mandatory Output Language:** Regardless of the input language, your final output MUST be in English. 3. **Error Handling:** If the input is in any language other than the accepted ones, you must respond with the standard error message.</RULES>\""
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                57,
+                62,
+                77
+            ]
+        },
+        {
+            "id": 60,
+            "title": "The Creative Consultant Pattern (Generating Options)",
+            "problem": "A prompt designed to produce a single 'optimal' output deprives the user of creative choice and doesn't teach them the principles behind the result.",
+            "solution": "Shift the prompt's objective from *automation* to *consultation*. Instruct the AI to generate multiple (2-3) distinct variations of the output, each exploring a different stylistic or conceptual direction. Crucially, require the AI to provide a brief rationale for each option, explaining the creative choices and technical parameters used.",
+            "tags": [
+                "interaction-design"
+            ],
+            "examples": [
+                "\"<OBJECTIVE>Your goal is to generate 3 distinct, stylistically diverse prompts based on the user's idea. For each prompt, provide a 'Rationale' explaining the creative direction and technical choices.</OBJECTIVE>\""
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                7,
+                8,
+                29
+            ]
+        },
+        {
+            "id": 61,
+            "title": "The Context-Configuration Mismatch",
+            "problem": "A prompt that is structurally sound and well-designed can still fail if its hardcoded configuration details (e.g., input/output languages, regional formats) do not match the specific end-user's context and needs.",
+            "solution": "For reusable prompts, explicitly separate the core logic from the user-context configuration. Isolate all context-dependent variables (language, locale, user skill level) into a dedicated `<CONFIGURATION>` block. Include a comment or instruction to the prompt engineer to review and adapt this block before deployment.",
+            "tags": [
+                "context-management",
+                "localization",
+                "modularity"
+            ],
+            "examples": [
+                "\"<CONFIGURATION><USER_CONTEXT>- Input Language: Russian- Output Language: English- User Level: Expert</USER_CONTEXT></CONFIGURATION>\""
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                22,
+                71,
+                76
+            ]
+        },
+        {
+            "id": 62,
+            "title": "The Bi-Lingual Development Standard (Instruction vs. Data)",
+            "problem": "Prompts that mix multiple languages without a clear protocol can confuse the LLM, especially when languages other than English are used for core instructions, leading to unpredictable behavior.",
+            "solution": "Establish a strict bi-lingual standard for development. 1. **Instructional Language (English):** All core logic, rules, tags, and commands MUST be in English. This is the 'backend language' of the prompt. 2. **User-Facing Language (e.g., Russian):** All text aimed at the end-user (dialogue, explanations, examples) MUST be in the target user's language. This is the 'frontend language'. 3. **Exception (Behavior Modeling):** If a prompt is explicitly designed to process a third language, that language MUST be used within the few-shot examples to accurately model and teach the AI the required behavior.",
+            "tags": [
+                "localization",
+                "quality-assurance",
+                "robustness"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                50,
+                57,
+                59
+            ]
+        },
+        {
+            "id": 63,
+            "title": "Defining Explicit Workflows",
+            "problem": "Without a clear sequence of operations, a multi-agent system can produce inconsistent or illogical results. The order of operations is left to the model's interpretation.",
+            "solution": "Explicitly define the workflow or chain of command between agents. State clearly the sequence in which agents are activated and what artifact is passed from one to the next (e.g., 'The Auditor's report is the input for the Strategist'). This ensures a predictable and repeatable process.",
+            "tags": [
+                "agent-design",
+                "control-flow",
+                "state-management",
+                "workflow"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                16,
+                24,
+                46
+            ]
+        },
+        {
+            "id": 64,
+            "title": "Implementing a Command-Line Interface (CLI)",
+            "problem": "Interacting with a complex prompt through natural language can be ambiguous and error-prone. The user might inadvertently trigger the wrong functionality or provide unclear instructions.",
+            "solution": "Define a set of explicit commands (e.g., `/analyze`, `/test`) that trigger specific workflows or agents. This creates a structured, predictable, and less ambiguous method of interaction, similar to a software application's command-line interface.",
+            "tags": [
+                "clarity",
+                "robustness"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                9,
+                52,
+                70
+            ]
+        },
+        {
+            "id": 65,
+            "title": "Self-Configuration Validation and Graceful Degradation",
+            "problem": "A prompt that relies on configuration parameters can fail unpredictably if a parameter is missing or malformed.",
+            "solution": "Add rules that explicitly check for the presence and validity of key parameters within the prompt itself. Define a default behavior or a 'graceful degradation' path. For example: 'If the `TARGET_LANGUAGE` parameter is missing, you MUST default to English and add a warning note.' This makes the prompt more robust and resilient.",
+            "tags": [
+                "error-handling",
+                "robustness"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                27,
+                61,
+                71
+            ]
+        },
+        {
+            "id": 66,
+            "title": "The Hybrid Artifact Pattern",
+            "problem": "AI-generated structured data (like a 'World Bible') can be either too prose-like and hard for machines to parse, or too granular and hard for humans to read and verify.",
+            "solution": "Design prompts to generate 'hybrid' artifacts that serve both audiences. For each entity, create both a human-readable prose summary (e.g., an `<AESTHETICS>` tag with artistic analogies) and a set of machine-readable granular fields (e.g., `<Key_Visuals>`, `<Material_Texture>`) including pre-optimized `<Generative_Keywords>` for the next AI in the chain.",
+            "tags": [
+                "clarity",
+                "prompt-architecture",
+                "structured-output"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                8,
+                69,
+                78
+            ]
+        },
+        {
+            "id": 67,
+            "title": "Evolving Helpful Refusal with Specificity",
+            "problem": "A generic 'Helpful Refusal' pattern tells the model to ask for more information when the input is vague. However, it doesn't guide the user on *what specific information* is needed, which can lead to inefficient clarification loops.",
+            "solution": "Enhance the 'Helpful Refusal' rule by linking it to a set of structured requirements. Instruct the model to state exactly which fields from its required 'Attribute Checklist' are missing. For example, instead of 'Please provide more details about the character,' the model should say, 'To complete the canon, please describe the character's hairstyle, eye color, and clothing style.'",
+            "tags": [
+                "clarity",
+                "efficiency",
+                "interaction-design",
+                "robustness"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                14,
+                23,
+                56
+            ]
+        },
+        {
+            "id": 68,
+            "title": "The Iterative Deep-Dive Pattern",
+            "problem": "A prompt successfully generates a complex, structured artifact (e.g., a world guide, a project plan, a character sheet) but the interaction terminates. This forces the user to start a new query to explore or elaborate on the details of what was just created, often with a loss of context.",
+            "solution": "Design the prompt's workflow to be cyclical. After generating the primary artifact, the final step must be a scripted 'call to collaboration' that invites the user to select an element from the output for a 'deep dive'. Subsequent steps must define how to perform this elaboration while maintaining context, thus turning a single-output generator into a multi-turn collaborative partner.",
+            "tags": [
+                "agent-design",
+                "self-correction",
+                "state-management",
+                "workflow"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                29,
+                36,
+                66
+            ]
+        },
+        {
+            "id": 69,
+            "title": "Design for Usability: Format Outputs for Easy Interaction",
+            "problem": "An AI's output, while technically correct, is difficult for the user to interact with (e.g., requires manual selection of text instead of one-click copy), creating friction and slowing down the workflow.",
+            "solution": "Anticipate the user's next step. Format final artifacts in a way that maximizes convenience and interoperability with other tools. Use markdown features like typed code blocks (e.g., ```text) to make key outputs easily and accurately copyable.",
+            "tags": [
+                "interaction-design"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                8,
+                66,
+                82
+            ]
+        },
+        {
+            "id": 70,
+            "title": "The User-as-Tester Workflow",
+            "problem": "A prompt may function perfectly with expected inputs but fail unpredictably with real-world, colloquial, or overly simple user requests. The prompt's creator may not anticipate all possible failure modes.",
+            "solution": "Formalize a testing and debugging loop that involves a human user. Treat the user's failed interactions not as errors, but as valuable test cases. The workflow is: 1. The user provides a real-world input that causes a failure. 2. The user provides the failed output for analysis. 3. The prompt engineer analyzes the discrepancy between expected and actual behavior to diagnose the root cause (e.g., intent override, ambiguity). 4. The prompt is iteratively strengthened with new defensive mechanisms to handle this failure case.",
+            "tags": [
+                "evaluation",
+                "quality-assurance"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                1,
+                20,
+                72
+            ]
+        },
+        {
+            "id": 71,
+            "title": "Configuration Before Logic: The Modularity Principle",
+            "problem": "Prompts often contain hard-coded values (like model names, version numbers, or specific URLs) scattered throughout the text. When these values need to be updated, it requires a manual and error-prone search-and-replace process, and the prompt cannot be easily repurposed for different contexts.",
+            "solution": "Isolate all dynamic or context-specific values into a dedicated configuration block (e.g., `<CONFIGURATION>`) at the top of the prompt. The main body of the prompt should then reference these values as variables (e.g., 'Your task is to act as an expert for the `<MODEL_NAME>` model'). This separates the prompt's core logic from its specific application, making it reusable, maintainable, and easier to update.",
+            "tags": [
+                "maintainability",
+                "modularity"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                22,
+                61,
+                76
+            ]
+        },
+        {
+            "id": 72,
+            "title": "The Proactive Initiation Pattern",
+            "problem": "A prompt designed for a specific workflow can remain passive or behave unpredictably if the user loads the system prompt but does not provide the necessary initial input. This creates uncertainty and can lead to errors on the very first turn.",
+            "solution": "Design the workflow (<WORKFLOW>) so that the very first step is a mandatory check of initial conditions or input validation. The AI must perform this check immediately upon activation. If the input is missing or does not meet requirements, the AI should proactively respond—for example, by using the 'Helpful Refusal' pattern—to guide the user. This ensures that the interaction always begins from a correct and valid state.",
+            "tags": [
+                "error-handling",
+                "evaluation",
+                "interaction-design",
+                "state-management",
+                "workflow"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                9,
+                40,
+                70
+            ]
+        },
+        {
+            "id": 73,
+            "title": "The DRY Principle for Prompts (Section Consolidation)",
+            "problem": "Prompts can become bloated and less effective when related, high-level information (like the AI's persona, the context, and the main objective) is scattered across multiple, overlapping sections. This forces the model to synthesize redundant information, increasing cognitive load and the risk of misinterpretation.",
+            "solution": "Apply the 'Don't Repeat Yourself' (DRY) principle. Consolidate closely related, high-level directives into a single, unified section (e.g., <ROLE_AND_GOAL>). This provides the model with a clear, concise, and unambiguous summary of its core mission at the very beginning of the prompt, before it processes more detailed logic and instructions.",
+            "tags": [
+                "clarity",
+                "efficiency",
+                "modularity",
+                "prompt-architecture"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                7,
+                8,
+                15
+            ]
+        },
+        {
+            "id": 74,
+            "title": "Instruction Over Example (The 'Algorithm vs. Artifact' Pattern)",
+            "problem": "For complex tasks, providing a static example can rigidly constrain the model's output and fail to cover diverse use cases. The model may overfit to the example's specific style or content.",
+            "solution": "Instead of providing a detailed example artifact, invest in creating a robust, step-by-step instructional algorithm within the prompt's directive. Deconstruct the logic of a good example into mandatory procedural steps, checks, and protocols. This teaches the model the *process* of creating a good output, making it more adaptable and reliable than if it were just mimicking a single example.",
+            "tags": [
+                "meta-prompting",
+                "scalability"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                25,
+                37,
+                42
+            ]
+        },
+        {
+            "id": 75,
+            "title": "The 'Justify Your Decisions' Protocol",
+            "problem": "An AI agent might provide a correct solution (e.g., recommend a tool or a specific architecture), but the user (especially a developer) doesn't understand the reasoning behind the choice, reducing trust and utility.",
+            "solution": "In the prompt's output format definition, explicitly require the agent to include a 'Justification' or 'Reasoning' field for every key decision or recommendation it makes. This forces the model to articulate its internal logic, making the output more transparent, trustworthy, and valuable.",
+            "tags": [
+                "clarity",
+                "structured-output"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                39,
+                40,
+                60
+            ]
+        },
+        {
+            "id": 76,
+            "title": "The Configuration Block Pattern",
+            "problem": "Key operational parameters like language, output verbosity, or persona mode are often scattered throughout the prompt's instructions, making them difficult to find and modify quickly.",
+            "solution": "Consolidate all high-level operational variables into a single, dedicated `<CONFIGURATION>` block at the top of the prompt. This creates a centralized 'control panel' for the prompt, allowing for easy adjustments without altering the core logic.",
+            "tags": [
+                "modularity"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                22,
+                61,
+                71
+            ]
+        },
+        {
+            "id": 77,
+            "title": "The Localization Block Pattern for Multilingual Prompts",
+            "problem": "Hardcoding user-facing strings (greetings, error messages, prompts) in a single language makes the prompt brittle and difficult to adapt for different locales. Translating requires modifying the core logic.",
+            "solution": "Isolate all user-facing text into a dedicated `<LOCALIZATION>` block, with nested `<STRINGS lang='...'>` sub-blocks for each supported language. The AI can then select the appropriate string based on a variable in the `<CONFIGURATION>` block. This completely decouples presentation from logic.",
+            "tags": [
+                "localization",
+                "modularity"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                32,
+                59,
+                62
+            ]
+        },
+        {
+            "id": 78,
+            "title": "The User-Facing Summary Pattern",
+            "problem": "Delivering a complex, structured artifact (like a large JSON object) as the sole output can overwhelm the user. The key insights are buried within the structure, forcing the user to manually parse and interpret the data, which creates a poor user experience.",
+            "solution": "After generating the primary technical artifact, the system should perform a final synthesis step. It must generate a concise, human-readable summary of the key findings, conclusions, and actions taken. This summary should be presented directly to the user, either before or alongside the link to the full artifact, to provide immediate value and context.",
+            "tags": [
+                "interaction-design"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                33,
+                66,
+                69
+            ]
+        },
+        {
+            "id": 79,
+            "title": "Dynamic Few-Shot Prompting",
+            "problem": "Static, hard-coded examples in a prompt (traditional few-shot) are often not the most relevant for every unique user query. This can bias the model with unhelpful examples, reducing the nuance and accuracy of the final output for a specific task.",
+            "solution": "Architect a system that decouples the main prompt from a library of high-quality examples. Before the final prompt is executed, a preliminary retrieval step performs a semantic search on the example library based on the user's query. The most relevant examples (top K) are then dynamically injected into the prompt's context. This ensures the model is always conditioned with the most pertinent guidance for the specific task at hand.",
+            "tags": [
+                "context-management",
+                "few-shot-prompting",
+                "retrieval-augmented-generation"
+            ],
+            "severity": "medium",
+            "related_lessons": [
+                49,
+                54,
+                55
+            ]
+        },
+        {
+            "id": 80,
+            "title": "Controlling the Initial Interaction",
+            "problem": "In a chat interface, a system prompt ending with a passive command like 'Wait for user input' can still trigger an immediate, generic LLM response like 'I am ready.'",
+            "solution": "To ensure a controlled start to a conversation, assign an explicit and active first task. Instruct the model: 'Your FIRST and ONLY initial action is to output the EXACT message \"...\" and then stop and wait for the user's reply.' This gives you full control over the opening line.",
+            "tags": [
+                "interaction-design",
+                "state-management"
+            ],
+            "examples": [],
+            "severity": "low",
+            "related_lessons": [
+                6,
+                35,
+                72
+            ]
+        },
+        {
+            "id": 81,
+            "title": "Purging Meta-Commentary for Clarity",
+            "problem": "Prompts often contain notes, comments, or instructions intended for the human prompt engineer (e.g., '// TODO: Add more examples', '## Notes for developer'). The LLM can misinterpret this meta-commentary as part of its operational instructions, leading to confusion or unexpected behavior.",
+            "solution": "All non-essential meta-commentary should be removed from the final prompt before it is executed. The prompt should only contain information directly relevant to the LLM's task to maximize the signal-to-noise ratio.",
+            "tags": [
+                "clarity",
+                "efficiency"
+            ],
+            "examples": [],
+            "severity": "low",
+            "related_lessons": [
+                15,
+                37,
+                41
+            ]
+        },
+        {
+            "id": 82,
+            "title": "Explicit Style and Tone Definition",
+            "problem": "The AI's output tone (e.g., formal, casual, technical) can be inconsistent or inappropriate for the intended audience if not explicitly defined.",
+            "solution": "Include a dedicated section in the prompt, such as `<STYLE_GUIDE>`, that clearly defines parameters like `TONE` and `AUDIENCE`. This removes ambiguity and ensures the generated text aligns with user expectations, making the output more professional and fit for purpose.",
+            "tags": [
+                "consistency"
+            ],
+            "severity": "low",
+            "related_lessons": [
+                8,
+                31,
+                69
+            ]
+        },
+        {
+            "id": 83,
+            "title": "Efficiency-First Tagging: Eliminating Redundant Wrappers",
+            "problem": "Wrapping the entire prompt content in a non-functional, redundant top-level tag (e.g., <Target_Prompt_Name>) adds unnecessary tokens, increases parsing overhead, and serves no functional purpose in defining the prompt's operation.",
+            "solution": "Use descriptive tags for functional blocks (<ROLE_DEFINITION>, <INSTRUCTIONS>), but eliminate single, all-encompassing wrapper tags to maximize token efficiency and focus the model on the core content.",
+            "tags": [
+                "context-management",
+                "efficiency",
+                "quality-assurance"
+            ],
+            "severity": "low",
+            "related_lessons": [
+                15,
+                22,
+                73
+            ]
+        }
+    ]
+}
